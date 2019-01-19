@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+		{
+			"label": "build program",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-g",
+				"main.cpp", "Game.cpp", "TextureManager.cpp", "GameObjects.cpp",
+				"-o",
+				"${workspaceFolder}\\build\\Game",
+				"-I",
+				"C:\\MinGW\\MinGW\\include\\SDL2",
+				"-lmingw32",
+				"-lSDL2main",
+				"-lSDL2",
+				"-lSDL2_Image"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
