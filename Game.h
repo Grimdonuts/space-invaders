@@ -3,6 +3,8 @@
 #include <SDL.h>
 #include <cstdint>
 #include "GameObjects.h"
+#include <ctime>
+
 
 class Game {
 public:
@@ -19,6 +21,8 @@ public:
 
 	static SDL_Renderer* renderer;
 private:
+
+	long gameTime;
 	bool isRunning;
 	SDL_Window* window;
 	int count = 0;

@@ -12,7 +12,6 @@ struct input_cmd{
 
 class GameObjects {
 	public:
-		GameObjects();
 		GameObjects(int inFrames, int inSpeed);
 		~GameObjects();
 
@@ -20,25 +19,31 @@ class GameObjects {
 		void DrawInvaders();
 		void MoveInvaders();
 		void Update(input_cmd cmd);
-		void LoadPlayer();
+		void DrawBullets(input_cmd cmd);
 
 	private:
+		long previousTime;
 		bool movingRight = true;
 		bool animated = false;
+		bool movementChanged = false;
 		int frames = 0;
 		int speed = 100;
 
-		int playerx = 605;
-		int playery = 625;
+		int playerx = 0;
+		int playery = 0;
 		int invadersx = 0;
 		int invadersy = 0;
-		int movements = 0;
 
 		SDL_Rect src, dest;
 		SDL_Rect invSrc, invDest;
+		SDL_Rect firstinvSrc, firstinvDest;
+		SDL_Rect wallSrc, wallDest;
+		SDL_Rect wall2Src, wall2Dest;
+		SDL_Rect bullSrc, bullDest;
 		
+		SDL_Texture* wall;
 		SDL_Texture* player;
-		SDL_Texture* ground;
+		SDL_Texture* bullet;
 		SDL_Texture* invaders1;
 		SDL_Texture* invaders2;
 		

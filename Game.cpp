@@ -1,7 +1,6 @@
 #include "Game.h"
 
 SDL_Renderer* Game::renderer = nullptr;
-GameObjects* player;
 GameObjects* map;
 input_cmd cmd = {};
 
@@ -36,7 +35,6 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 		isRunning = false;
 	}
 
-	player = new GameObjects();
 	map = new GameObjects(2, 300);
 }
 
@@ -48,13 +46,13 @@ void Game::HandleEvents() {
 
 	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 	{
-		if (keyboard_state_array[SDL_SCANCODE_UP])
+		if (keyboard_state_array[SDL_SCANCODE_SPACE])
 		{
-			cmd.up = 1;
+			cmd.fire = 1;
 			//std::cout << "up" << std::endl;
 		}
 		else {
-			cmd.up = 0;
+			cmd.fire = 0;
 		}
 		if (keyboard_state_array[SDL_SCANCODE_DOWN])
 		{
@@ -94,20 +92,19 @@ void Game::HandleEvents() {
 
 void Game::Update()
 {
-	player->Update(cmd);
+	map->Update(cmd);
 	map->MoveInvaders();
 }
 
 void Game::Render()
 {
 	SDL_RenderClear(renderer);
-	player->LoadPlayer();
 	map->DrawInvaders();
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Clean() {
-	delete player;
+	delete map;
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();

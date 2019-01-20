@@ -48,7 +48,11 @@
 		"thread": "cpp",
 		"unordered_map": "cpp",
 		"vector": "cpp",
-		"xhash": "cpp"
+		"xhash": "cpp",
+		"array": "cpp",
+		"bitset": "cpp",
+		"iterator": "cpp",
+		"ctime": "cpp"
 	},
 	"C_Cpp.intelliSenseEngineFallback": "Enabled"
 }

@@ -1,5 +1,7 @@
 #include "Game.h"
 #include <SDL_video.h>
+#include <iostream>
+#include <ctime>
 
 int main(int argc, char* argv[]) {
 
@@ -14,7 +16,6 @@ int main(int argc, char* argv[]) {
 
 	while(game.Running())
 	{
-
 		frameStart = SDL_GetTicks();
 
 		game.HandleEvents();
