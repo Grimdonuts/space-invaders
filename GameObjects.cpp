@@ -131,16 +131,16 @@ void GameObjects::DrawInvaders()
 				case 0:
 				break;
 				case 1:
-					invDest.x = 161 +  (j * 32) + invadersx;
+					invDest.x = resolutionOffset + (j * 32) + invadersx;
 					invDest.y = (i * 32) + invadersy;
 					TextureManager::Draw(invaders1, invSrc, invDest);
 				break;
 				case 2:
-					firstinvDest.x = 161 +  (6 * 32) + invadersx;
+					firstinvDest.x = resolutionOffset + (6 * 32) + invadersx;
 					firstinvDest.y = (2 * 32) + invadersy;
 					if ((firstinvDest.x + invadersx) <= 225) firstinvDest.x = 225;
 
-					invDest.x = 161 +  (j * 32) + invadersx;
+					invDest.x = resolutionOffset + (j * 32) + invadersx;
 					invDest.y = (i * 32) + invadersy;
 					TextureManager::Draw(invaders2, invSrc, invDest);
 				break;
@@ -149,7 +149,7 @@ void GameObjects::DrawInvaders()
 				case 9:
 					if (playerx == 0 && playery == 0)
 					{
-						playerx = 161 + (j*32);
+						playerx = resolutionOffset + (j*32);
 						playery = (i*32);
 					}
 					dest.x = playerx;
@@ -157,12 +157,12 @@ void GameObjects::DrawInvaders()
 					TextureManager::Draw(player, src, dest);
 				break;
 				case 10:
-					wallDest.x = 161 + (j * 32);
+					wallDest.x = resolutionOffset + (j * 32);
 					wallDest.y = (i * 32);
 					TextureManager::Draw(wall, wallSrc, wallDest);
 				break;
 				case 11:
-					wall2Dest.x = 161 + (j * 32);
+					wall2Dest.x = resolutionOffset + (j * 32);
 					wall2Dest.y = (i * 32);
 					TextureManager::Draw(wall, wall2Src, wall2Dest);
 				break;

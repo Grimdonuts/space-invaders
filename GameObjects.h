@@ -22,7 +22,8 @@ class GameObjects {
 		void DrawBullets(input_cmd cmd);
 
 	private:
-		long previousTime;
+		int resolutionW;
+		int resolutionH;
 		bool movingRight = true;
 		bool animated = false;
 		bool movementChanged = false;
