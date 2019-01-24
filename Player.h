@@ -4,8 +4,8 @@
 
 class Player {
 	public:
-		int playerx = 640;
-		int playery = 600;
+		int playerx;
+		int playery;
 
 		void LoadPlayer();
 		void UpdatePlayerCoord();

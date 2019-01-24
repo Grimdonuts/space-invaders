@@ -27,7 +27,6 @@ public:
 	void Render();
 	void Clean();
 	bool Running() { return isRunning; };
-
 	static SDL_Renderer* renderer;
 private:
 	float resolutionW;

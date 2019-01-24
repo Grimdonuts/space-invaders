@@ -45,6 +45,8 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 
 	player = new Player();
 	player->LoadPlayer();
+	player->playerx = (resolutionW / 2) - (player->GetPlayerDestRect().w / 2);
+	player->playery = resolutionH * 0.85f;
 
 	screenEdgeBeginning = (resolutionW * 0.25f) / 2;
 	screenEdgeEnding = ((resolutionW * 0.75f) + screenEdgeBeginning);
