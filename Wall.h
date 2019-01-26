@@ -5,10 +5,10 @@ class Wall {
 	public:
 		Wall();
 		~Wall();
-		void LoadWall(int x, int y);
+		void LoadWall(int x, int y, float wallYLength);
 		void SetWallY(int y);
 
-		SDL_Texture* GetWallTexture(){ return wall; };
+		SDL_Texture* GetWallTexture(){ return wall; }
 		SDL_Rect GetWallSrcRect() { return src; }
 		SDL_Rect GetWallDestRect() { return dest; }
 		int GetYCoord(int index) { return wallYCoords[index]; }

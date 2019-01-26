@@ -3,11 +3,15 @@
 #include "Player.h"
 #include <iostream>
 #include "Wall.h"
+#include "Invaders.h"
 
 
 SDL_Renderer* Game::renderer = nullptr;
-Player* player;
-std::vector<Wall*> walls;
+
+Invaders invaders[5][11];
+Player player;
+Wall walls[2];
+int wallLoop;
 
 Game::Game()
 {}
@@ -18,13 +22,14 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 {
 	resolutionW = width;
 	resolutionH = height;
-
+	wallLoop = (resolutionH / 32);
 	int flags = 0;
 
 	if (fullscreen)
 	{
 		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
 	}
+	//flags = SDL_WINDOW_RESIZABLE;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
 	{
@@ -42,23 +47,34 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 	else {
 		isRunning = false;
 	}
-
-	player = new Player();
-	player->LoadPlayer();
-	player->playerx = (resolutionW / 2) - (player->GetPlayerDestRect().w / 2);
-	player->playery = resolutionH * 0.85f;
+	player.LoadPlayer();
+	player.playerx = (resolutionW / 2) - (player.GetPlayerDestRect().w / 2);
+	player.playery = resolutionH * 0.85f;
 
 	screenEdgeBeginning = (resolutionW * 0.25f) / 2;
 	screenEdgeEnding = ((resolutionW * 0.75f) + screenEdgeBeginning);
-	Wall* firstWall;
-	firstWall = new Wall();
-	firstWall->LoadWall(screenEdgeBeginning, 0);
-	walls.push_back(firstWall);
-	Wall* secondWall = new Wall();
-	secondWall->LoadWall(screenEdgeEnding, 0);
-	walls.push_back(secondWall);
+	Wall firstWall;
+	firstWall.LoadWall(screenEdgeBeginning, 0, (resolutionH / 64));
+	walls[0] = firstWall;
+	Wall secondWall;
+	secondWall.LoadWall(screenEdgeEnding, 0, (resolutionH / 64));
+	walls[1] = secondWall;
 
-	//map = new GameObjects(2, 300);
+for (int j = 0; j < 5; j++)
+{
+	for (int i = 0; i < 11; i++)
+	{
+		Invaders invader;
+		if (j < 1) invader.LoadInvaders(2);
+		else if(j <= 2) invader.LoadInvaders(1);
+		else invader.LoadInvaders(3);
+		
+		// 29% to more or less get them centered with the board
+		invader.SetInvadersXY((resolutionW * 0.29f) + (i * 50), (resolutionH * 0.05) + (j * 50)); // 50 here because 64 is too spacey and 32 is too close
+		
+		invaders[j][i] = invader;
+	}
+}
 }
 
 void Game::HandleEvents() {
@@ -115,30 +131,55 @@ void Game::HandleEvents() {
 
 void Game::Update()
 {
-	if (cmd.left && player->GetPlayerDestRect().x > walls[0]->GetWallDestRect().x + (walls[0]->GetWallDestRect().w / 2)) { player->playerx -= 8; std::cout << player->playerx << std::endl; }
-	if (cmd.right && player->GetPlayerDestRect().x < walls[1]->GetWallDestRect().x - (walls[1]->GetWallDestRect().w / 2))  { player->playerx += 8; std::cout << player->playerx << std::endl; }
-	if (cmd.down /*&& dest.x <= (wall2Dest.x - wall2Dest.w)*/) { std::cout << player->playerx << std::endl; }
-	player->UpdatePlayerCoord();
-	//map->MoveInvaders();
+	if (cmd.left && player.GetPlayerDestRect().x > walls[0].GetWallDestRect().x + (walls[0].GetWallDestRect().w / 2)) { player.playerx -= 8; std::cout << player.playerx << std::endl; }
+	if (cmd.right && player.GetPlayerDestRect().x < walls[1].GetWallDestRect().x - (walls[1].GetWallDestRect().w / 2))  { player.playerx += 8; std::cout << player.playerx << std::endl; }
+	if (cmd.down /*&& dest.x <= (wall2Dest.x - wall2Dest.w)*/) { std::cout << player.playerx << std::endl; }
+	player.UpdatePlayerCoord();
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			invaders[j][i].AnimateInvaders();
+		}
+	}
 }
 
 void Game::Render()
 {
 	SDL_RenderClear(renderer);
-	TextureManager::Draw(player->GetPlayerTexture(), player->GetPlayerSrcRect(), player->GetPlayerDestRect());
-	for (int i = 0; i < 22; i++)
+	TextureManager::Draw(player.GetPlayerTexture(), player.GetPlayerSrcRect(), player.GetPlayerDestRect());
+	for (int i = 0; i < wallLoop; i++)
 	{
-		walls[0]->SetWallY(walls[0]->GetYCoord(i));
-		TextureManager::Draw(walls[0]->GetWallTexture(), walls[0]->GetWallSrcRect(), walls[0]->GetWallDestRect());
-		walls[1]->SetWallY(walls[1]->GetYCoord(i));
-		TextureManager::Draw(walls[1]->GetWallTexture(), walls[1]->GetWallSrcRect(), walls[1]->GetWallDestRect());
+		walls[0].SetWallY(walls[0].GetYCoord(i));
+		TextureManager::Draw(walls[0].GetWallTexture(), walls[0].GetWallSrcRect(), walls[0].GetWallDestRect());
+		walls[1].SetWallY(walls[1].GetYCoord(i));
+		TextureManager::Draw(walls[1].GetWallTexture(), walls[1].GetWallSrcRect(), walls[1].GetWallDestRect());
 	}
+
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			TextureManager::Draw(invaders[j][i].GetInvaderTexture(), invaders[j][i].GetInvaderSrcRect(), invaders[j][i].GetInvaderDestRect());
+		}
+	}
+	
 	SDL_RenderPresent(renderer);
 }
 
 void Game::Clean() {
-	walls.clear();
-	delete player;
+	SDL_DestroyTexture(walls[0].GetWallTexture());
+	SDL_DestroyTexture(walls[1].GetWallTexture());
+	walls[0] = {};
+	walls[1] = {};
+	SDL_DestroyTexture(player.GetPlayerTexture());
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			SDL_DestroyTexture(invaders[j][i].GetInvaderTexture());
+		}
+	}
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();

@@ -3,7 +3,8 @@
 
 Wall::Wall(){}
 Wall::~Wall(){}
-void Wall::LoadWall(int x, int y)
+
+void Wall::LoadWall(int x, int y, float wallYLength)
 {
 	src.x = 0;
 	src.y = 0;
@@ -23,7 +24,7 @@ void Wall::LoadWall(int x, int y)
 	}
 	dest.y = y;
 
-	for (int i = 0; i < 22; i++)
+	for (int i = 0; i < wallYLength; i++)
 	{
 		wallYCoords.push_back(i * 64);
 	}
