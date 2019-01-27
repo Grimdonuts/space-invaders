@@ -19,6 +19,7 @@ Timer firingCooldown;
 int fired = 0;
 int invadersCount = 55;
 int invmodx = 0;
+int invmody = 0;
 
 int wallLoop;
 bool movingRight = true;
@@ -173,8 +174,23 @@ void Game::Update()
 		firingCooldown.stop();
 	}
 
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			invaders[j][i].AnimateInvaders(invaderSpeed);
+			
+			if (movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead)
+			{
+				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x + invmodx, invaders[j][i].GetInvaderDestRect().y + invmody);
+			}
+			else if (!movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead) {
+				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x - invmodx, invaders[j][i].GetInvaderDestRect().y + invmody);
+			}
+		}
+	}
 
-	int y = 0;
+	invmody = 0;
 	
 	for (int j = 0; j < 5; j++)
 	{
@@ -184,30 +200,14 @@ void Game::Update()
 			 { 
 				movingRight = true;
 				invmodx = invaderMovespeed;
-				y += 10;
+				invmody += 10;
 			 }
 				
 			if (movingRight && !(invaders[j][i].GetInvaderDestRect().x < screenEdgeEnding - 32))
 			{ 
 				movingRight = false;
 				invmodx = invaderMovespeed;
-				y += 10;
-			 }
-		}
-	}
-
-	for (int j = 0; j < 5; j++)
-	{
-		for (int i = 0; i < 11; i++)
-		{
-			invaders[j][i].AnimateInvaders(invaderSpeed);
-			
-			if (movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead)
-			{
-				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x + invmodx, invaders[j][i].GetInvaderDestRect().y + y);
-			}
-			else if (!movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead) {
-				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x - invmodx, invaders[j][i].GetInvaderDestRect().y + y);
+				invmody += 10;
 			}
 		}
 	}
@@ -234,37 +234,37 @@ void Game::Update()
 					invaders[j][k].timerEnd = SDL_GetTicks() + 300;
 					invadersCount--;
 				}
-
-				switch (invadersCount)
-				{
-					case 45:
-						invaderSpeed = 395;
-						invmodx = invaderMovespeed;
-						invaderMovespeed = 1;
-					break;
-					case 35:
-						invaderSpeed = 385;
-						invmodx = invaderMovespeed;
-						invaderMovespeed = 2;
-					break;
-					case 25:
-						invaderSpeed = 375;
-						invmodx = invaderMovespeed;
-						invaderMovespeed = 2;
-					break;
-					case 15:
-						invaderSpeed = 350;
-						invmodx = invaderMovespeed;
-						invaderMovespeed = 4;
-					break;
-					case 1:
-						invaderSpeed = 300;
-						invmodx = invaderMovespeed;
-						invaderMovespeed = 12;
-					break;
-				}
 			}
 		}
+	}
+
+	switch (invadersCount)
+	{
+		case 45:
+			invaderSpeed = 395;
+			invmodx = invaderMovespeed;
+			invaderMovespeed = 1;
+		break;
+		case 35:
+			invaderSpeed = 385;
+			invmodx = invaderMovespeed;
+			invaderMovespeed = 2;
+		break;
+		case 25:
+			invaderSpeed = 375;
+			invmodx = invaderMovespeed;
+			invaderMovespeed = 2;
+		break;
+		case 15:
+			invaderSpeed = 350;
+			invmodx = invaderMovespeed;
+			invaderMovespeed = 4;
+		break;
+		case 1:
+			invaderSpeed = 300;
+			invmodx = invaderMovespeed;
+			invaderMovespeed = 12;
+		break;
 	}
 }
 
