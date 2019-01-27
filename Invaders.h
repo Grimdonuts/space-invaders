@@ -7,17 +7,16 @@ class Invaders {
 		~Invaders();
 		void LoadInvaders(int invaderType);
 		void SetInvadersXY(int x, int y);
-		void AnimateInvaders();
+		void AnimateInvaders(int speed);
 
 		SDL_Texture* GetInvaderTexture() { return invader; };
 		SDL_Rect GetInvaderSrcRect() { return src; }
 		SDL_Rect GetInvaderDestRect() { return dest; }
-		int GetYCoord(int index) { return dest.x; }
-		int GetXCoord(int index) { return dest.x; }
-		
+		bool dead = false;
+		bool deathplayed = false;
+		Timer deathTimer;
+		int timerEnd = 0;
 	private:
-		int invadersCount = 50;
-		int invaderSpeed = 0;
 		SDL_Texture* invader;
 		SDL_Rect src;
 		SDL_Rect dest;

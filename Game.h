@@ -2,8 +2,8 @@
 
 #include <SDL.h>
 #include <cstdint>
-#include <ctime>
 #include <vector>
+#include "Timer.h"
 
 struct input_cmd{
     uint32_t up:1;
@@ -21,7 +21,8 @@ public:
 
 	input_cmd cmd = {};
 	void Init(const char* title, int x, int y, int width, int height, bool fullscreen);
-	
+	int invaderSpeed;
+	int invaderMovespeed;
 	void HandleEvents();
 	void Update();
 	void Render();

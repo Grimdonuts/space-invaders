@@ -4,6 +4,8 @@
 Invaders::Invaders(){}
 Invaders::~Invaders(){}
 
+const int invaderFrames = 2;
+
 void Invaders::LoadInvaders(int invaderType) 
 {
 	src.x = 0;
@@ -25,7 +27,12 @@ void Invaders::SetInvadersXY(int x, int y)
 	dest.y = y;
 }
 
-void Invaders::AnimateInvaders()
+void Invaders::AnimateInvaders(int speed)
 {
-	src.x = src.w * static_cast<int>((SDL_GetTicks() / 300) % 2);
+	if (!dead) src.x = src.w * static_cast<int>((SDL_GetTicks() / speed) % 2);
+	else if (((SDL_GetTicks() < timerEnd)))
+	{
+		invader = TextureManager::LoadTexture("assets/deadinvader.png");
+		src.x = 0;
+	}
 }

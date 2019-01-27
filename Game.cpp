@@ -4,6 +4,8 @@
 #include <iostream>
 #include "Wall.h"
 #include "Invaders.h"
+#include "Bulllets.h"
+
 
 
 SDL_Renderer* Game::renderer = nullptr;
@@ -11,7 +13,15 @@ SDL_Renderer* Game::renderer = nullptr;
 Invaders invaders[5][11];
 Player player;
 Wall walls[2];
+std::vector<Bullets> bullets;
+
+Timer firingCooldown;
+int fired = 0;
+int invadersCount = 55;
+int invmodx = 0;
+
 int wallLoop;
+bool movingRight = true;
 
 Game::Game()
 {}
@@ -25,6 +35,10 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 	wallLoop = (resolutionH / 32);
 	int flags = 0;
 
+	invaderSpeed = 400;
+	invaderMovespeed = 1;
+	invmodx = 1;
+
 	if (fullscreen)
 	{
 		flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
@@ -36,7 +50,7 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 
 		window = SDL_CreateWindow(title, x, y, width, height, flags);
 
-		renderer = SDL_CreateRenderer(window, -1, 0);
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); //Use vsync when we can if 120 fps or higher from 120 hz , 144hz the framerate cap will take care of it.
 		if (renderer)
 		{
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -52,7 +66,8 @@ void Game::Init(const char* title, int x, int y, int width, int height, bool ful
 	player.playery = resolutionH * 0.85f;
 
 	screenEdgeBeginning = (resolutionW * 0.25f) / 2;
-	screenEdgeEnding = ((resolutionW * 0.75f) + screenEdgeBeginning);
+	screenEdgeEnding = ((resolutionW * 0.75f));
+	screenEdgeEnding += (screenEdgeEnding * 0.10f);
 	Wall firstWall;
 	firstWall.LoadWall(screenEdgeBeginning, 0, (resolutionH / 64));
 	walls[0] = firstWall;
@@ -85,10 +100,9 @@ void Game::HandleEvents() {
 
 	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 	{
-		if (keyboard_state_array[SDL_SCANCODE_SPACE])
+		if (keyboard_state_array[SDL_SCANCODE_SPACE] && event.type == SDL_KEYDOWN)
 		{
 			cmd.fire = 1;
-			//std::cout << "up" << std::endl;
 		}
 		else {
 			cmd.fire = 0;
@@ -96,7 +110,6 @@ void Game::HandleEvents() {
 		if (keyboard_state_array[SDL_SCANCODE_DOWN])
 		{
 			cmd.down = 1;
-			//std::cout << "down" << std::endl;
 		}
 		else {
 			cmd.down = 0;
@@ -105,7 +118,6 @@ void Game::HandleEvents() {
 		if (keyboard_state_array[SDL_SCANCODE_RIGHT])
 		{
 			cmd.right = 1;
-			//std::cout << "right" << std::endl;
 		}
 		else {
 			cmd.right = 0;
@@ -113,7 +125,6 @@ void Game::HandleEvents() {
 		if (keyboard_state_array[SDL_SCANCODE_LEFT])
 		{
 			cmd.left = 1;
-			//std::cout << "left" << std::endl;
 		}
 		else {
 			cmd.left = 0;
@@ -131,15 +142,128 @@ void Game::HandleEvents() {
 
 void Game::Update()
 {
-	if (cmd.left && player.GetPlayerDestRect().x > walls[0].GetWallDestRect().x + (walls[0].GetWallDestRect().w / 2)) { player.playerx -= 8; std::cout << player.playerx << std::endl; }
-	if (cmd.right && player.GetPlayerDestRect().x < walls[1].GetWallDestRect().x - (walls[1].GetWallDestRect().w / 2))  { player.playerx += 8; std::cout << player.playerx << std::endl; }
-	if (cmd.down /*&& dest.x <= (wall2Dest.x - wall2Dest.w)*/) { std::cout << player.playerx << std::endl; }
+	if (cmd.left && player.GetPlayerDestRect().x > walls[0].GetWallDestRect().x + (walls[0].GetWallDestRect().w / 2)) { player.playerx -= 8;  }
+	if (cmd.right && player.GetPlayerDestRect().x < walls[1].GetWallDestRect().x - (walls[1].GetWallDestRect().w / 2))  { player.playerx += 8; }
+	if (cmd.down ) { std::cout << player.playerx << std::endl; }
+
 	player.UpdatePlayerCoord();
+	
+	if (cmd.fire && !firingCooldown.isStarted() || cmd.fire &&
+		bullets.size() == 0 && firingCooldown.isStarted()) { 
+		
+		if (!firingCooldown.isStarted())
+		{
+			firingCooldown.start();
+		}
+		else {
+			firingCooldown.stop();
+			firingCooldown.start();
+		}
+
+		fired = firingCooldown.getTicks();
+
+		Bullets bullet;
+		bullet.LoadBullets();
+		bullet.SetBulletXY(player.GetPlayerDestRect().x + 16,player.playery - 5);
+
+		bullets.push_back(bullet);
+	}
+	else if (firingCooldown.getTicks() / 1000 == 2)
+	{
+		firingCooldown.stop();
+	}
+
+
+	int y = 0;
+	
 	for (int j = 0; j < 5; j++)
 	{
 		for (int i = 0; i < 11; i++)
 		{
-			invaders[j][i].AnimateInvaders();
+			if (!movingRight && !(invaders[j][i].GetInvaderDestRect().x > screenEdgeBeginning + 64))
+			 { 
+				movingRight = true;
+				invmodx = invaderMovespeed;
+				y += 10;
+			 }
+				
+			if (movingRight && !(invaders[j][i].GetInvaderDestRect().x < screenEdgeEnding - 32))
+			{ 
+				movingRight = false;
+				invmodx = invaderMovespeed;
+				y += 10;
+			 }
+		}
+	}
+
+	for (int j = 0; j < 5; j++)
+	{
+		for (int i = 0; i < 11; i++)
+		{
+			invaders[j][i].AnimateInvaders(invaderSpeed);
+			
+			if (movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead)
+			{
+				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x + invmodx, invaders[j][i].GetInvaderDestRect().y + y);
+			}
+			else if (!movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[j][i].dead) {
+				invaders[j][i].SetInvadersXY(invaders[j][i].GetInvaderDestRect().x - invmodx, invaders[j][i].GetInvaderDestRect().y + y);
+			}
+		}
+	}
+
+	for (int i = 0; i < bullets.size(); i++)
+	{
+		//std::cout<< bullets.size() << std::endl;
+		if ( bullets[i].GetBulletDestRect().y <= 0) { bullets.erase(bullets.begin() + i); }
+		else if (bullets[i].hit) { bullets.erase(bullets.begin() + i); }
+		else { bullets[i].SetBulletXY(bullets[i].GetBulletDestRect().x, bullets[i].GetBulletDestRect().y - 15); }
+
+		for (int j = 0; j < 5; j++)
+		{
+			for (int k = 0; k < 11; k++)
+			{
+				if (bullets[i].GetBulletDestRect().x <= invaders[j][k].GetInvaderDestRect().x + (invaders[j][k].GetInvaderDestRect().w / 2) &&
+				bullets[i].GetBulletDestRect().x >= invaders[j][k].GetInvaderDestRect().x - (invaders[j][k].GetInvaderDestRect().w / 2) && 
+				bullets[i].GetBulletDestRect().y <= invaders[j][k].GetInvaderDestRect().y + (invaders[j][k].GetInvaderDestRect().h / 2) &&
+				bullets[i].GetBulletDestRect().y >= invaders[j][k].GetInvaderDestRect().y - (invaders[j][k].GetInvaderDestRect().h / 2) &&
+				!invaders[j][k].dead)
+				{
+					bullets[i].hit = true;
+					invaders[j][k].dead = true;
+					invaders[j][k].timerEnd = SDL_GetTicks() + 300;
+					invadersCount--;
+				}
+
+				switch (invadersCount)
+				{
+					case 45:
+						invaderSpeed = 395;
+						invmodx = invaderMovespeed;
+						invaderMovespeed = 1;
+					break;
+					case 35:
+						invaderSpeed = 385;
+						invmodx = invaderMovespeed;
+						invaderMovespeed = 2;
+					break;
+					case 25:
+						invaderSpeed = 375;
+						invmodx = invaderMovespeed;
+						invaderMovespeed = 2;
+					break;
+					case 15:
+						invaderSpeed = 350;
+						invmodx = invaderMovespeed;
+						invaderMovespeed = 4;
+					break;
+					case 1:
+						invaderSpeed = 300;
+						invmodx = invaderMovespeed;
+						invaderMovespeed = 12;
+					break;
+				}
+			}
 		}
 	}
 }
@@ -160,8 +284,19 @@ void Game::Render()
 	{
 		for (int i = 0; i < 11; i++)
 		{
-			TextureManager::Draw(invaders[j][i].GetInvaderTexture(), invaders[j][i].GetInvaderSrcRect(), invaders[j][i].GetInvaderDestRect());
+			if (!invaders[j][i].dead)
+			{
+				TextureManager::Draw(invaders[j][i].GetInvaderTexture(), invaders[j][i].GetInvaderSrcRect(), invaders[j][i].GetInvaderDestRect());
+			}
+			else if (SDL_GetTicks() < invaders[j][i].timerEnd) 
+			{
+				TextureManager::Draw(invaders[j][i].GetInvaderTexture(), invaders[j][i].GetInvaderSrcRect(), invaders[j][i].GetInvaderDestRect());
+			}
 		}
+	}
+	for (int i = 0; i < bullets.size(); i++)
+	{
+		if (!bullets[i].hit) TextureManager::Draw(bullets[i].GetBulletTexture(), bullets[i].GetBulletSrcRect(), bullets[i].GetBulletDestRect());
 	}
 	
 	SDL_RenderPresent(renderer);
