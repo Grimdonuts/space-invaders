@@ -45,7 +45,6 @@ int main(int argc, char* argv[])
 
 		if (game.gameOver)
 		{
-			//game.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			game.Init(1280,720);
 			game.gameOver = false;
 		}
