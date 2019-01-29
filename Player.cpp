@@ -15,6 +15,7 @@ void Player::LoadPlayer()
 
 	playerx = playerx - (dest.w / 2);
 	player = TextureManager::LoadTexture("assets/tank.png");
+	deadTexture = TextureManager::LoadTexture("assets/deadtank.png");
 }
 
 void Player::UpdatePlayerCoord()
@@ -28,4 +29,12 @@ void Player::UpdatePlayerCoord()
 	dest.y = playery;
 	dest.w = src.w * 2;
 	dest.h = src.h * 2;
+}
+
+void Player::SetPlayerLivesCoord(int x, int y, int destw, int desth)
+{
+	dest.x = x;
+	dest.y = y;
+	dest.h = desth;
+	dest.w = destw;
 }

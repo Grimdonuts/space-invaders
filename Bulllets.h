@@ -6,6 +6,7 @@ class Bullets {
 		Bullets();
 		~Bullets();
 		bool hit = false;
+		int timerEnd = 0;
 
 		void LoadBullets();
 		void SetBulletXY(int x, int y);

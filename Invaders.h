@@ -13,9 +13,10 @@ class Invaders {
 		SDL_Rect GetInvaderSrcRect() { return src; }
 		SDL_Rect GetInvaderDestRect() { return dest; }
 		bool dead = false;
-		bool deathplayed = false;
-		Timer deathTimer;
+		
 		int timerEnd = 0;
+		int invadermody = 0;
+		int invadermodx = 1;
 	private:
 		SDL_Texture* invader;
 		SDL_Rect src;

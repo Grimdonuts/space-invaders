@@ -20,13 +20,15 @@ public:
 	~Game();
 
 	input_cmd cmd = {};
-	void Init(const char* title, int x, int y, int width, int height, bool fullscreen);
+	void Init( int width, int height);
 	int invaderSpeed;
 	int invaderMovespeed;
+	bool gameOver = false;
 	void HandleEvents();
 	void Update();
 	void Render();
 	void Clean();
+	void Reset();
 	bool Running() { return isRunning; };
 	static SDL_Renderer* renderer;
 private:
@@ -35,7 +37,6 @@ private:
 	int screenEdgeBeginning;
 	int screenEdgeEnding;
 	bool isRunning;
-	SDL_Window* window;
 	int count = 0;
 	int movement = 9;
 };
