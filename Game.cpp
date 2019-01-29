@@ -322,14 +322,21 @@ void Game::Update()
 	randomInv1 = rand() % 55;
 	randomInv2 = rand() % 55;
 
-	while (invaders[randomInv1].dead)
+	if (invadersCount != 0)
 	{
-		randomInv1 = rand() % 55;
+		while (invaders[randomInv1].dead)
+		{
+			randomInv1 = rand() % 55;
+		}
 	}
-	while (invaders[randomInv2].dead)
+	if (invadersCount > 1)
 	{
+		while (invaders[randomInv2].dead)
+		{
 		randomInv2 = rand() % 55;
+		}
 	}
+	
 
 	for (int i = 0; i < 55; i++)
 	{
@@ -348,7 +355,7 @@ void Game::Update()
 	for (int i = 0; i < 2; i++)
 	{
 		if (invaders[randomInv1].dead) randomInv1 = -1;
-		if (invaders[randomInv2].dead) randomInv2 = -1;
+		if (invaders[randomInv2].dead || invadersCount < 2) randomInv2 = -1;
 
 		if (invaderBullets[i].GetBulletDestRect().x == 9999 && invaderBullets[i].GetBulletDestRect().y == 9999 && i == 0 && randomInv1 != -1)
 		{
@@ -469,6 +476,8 @@ void Game::Render()
 			}
 		}
 	}
+
+	if (invadersCount <= 0) player.playerLives = 0; // add a victory screen sometime
 	
 	switch (player.playerLives)
 	{
@@ -484,7 +493,7 @@ void Game::Render()
 		case 1:
 		TextureManager::Draw(playerLivesDisplay[0].GetPlayerTexture(), playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
 		break;
-		case 0:
+		case 0: // add a gameover screen sometime
 		SDL_DestroyTexture(walls[0].GetWallTexture());
 		SDL_DestroyTexture(walls[1].GetWallTexture());
 		walls[0] = {};
