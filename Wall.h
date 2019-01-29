@@ -13,7 +13,7 @@ class Wall {
 		SDL_Rect GetWallDestRect() { return dest; }
 		int GetYCoord(int index) { return wallYCoords[index]; }
 	private:
-		std::vector<int> wallYCoords;
+		int wallYCoords[100] = {};
 		SDL_Texture* wall;
 		SDL_Rect src;
 		SDL_Rect dest;

@@ -9,6 +9,7 @@ class Bullets {
 		int timerEnd = 0;
 		int randomInv = 0;
 
+		void Clear();
 		void LoadBullets();
 		void SetBulletXY(int x, int y);
 		SDL_Texture* GetBulletTexture() { return bullet; };

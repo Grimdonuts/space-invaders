@@ -26,7 +26,7 @@ void Wall::LoadWall(int x, int y, float wallYLength)
 
 	for (int i = 0; i < wallYLength; i++)
 	{
-		wallYCoords.push_back(i * 64);
+		wallYCoords[i] = (i * 64);
 	}
 	wall = TextureManager::LoadTexture("assets/wall.png");
 }

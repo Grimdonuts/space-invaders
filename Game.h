@@ -20,6 +20,7 @@ public:
 	~Game();
 
 	input_cmd cmd = {};
+	//void MenuScreen();
 	void Init( int width, int height);
 	int invaderSpeed;
 	int invaderMovespeed;
@@ -28,7 +29,6 @@ public:
 	void Update();
 	void Render();
 	void Clean();
-	void Reset();
 	bool Running() { return isRunning; };
 	static SDL_Renderer* renderer;
 private:

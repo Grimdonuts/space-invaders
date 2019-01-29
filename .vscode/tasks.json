@@ -7,7 +7,7 @@
 			"command": "g++",
 			"args": [
 				"-g",
-				"main.cpp", "Game.cpp", "TextureManager.cpp", "Player.cpp", "Wall.cpp", "Invaders.cpp", "Timer.cpp", "Bullets.cpp",
+				"main.cpp", "Game.cpp", "TextureManager.cpp", "Player.cpp", "Wall.cpp", "Invaders.cpp", "Timer.cpp", "Bullets.cpp", "Barrier.cpp",
 				"-o",
 				"${workspaceFolder}\\build\\Game",
 				"-I",

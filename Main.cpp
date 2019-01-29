@@ -4,9 +4,9 @@
 #include <ctime>
 #include "Timer.h"
 
-int main(int argc, char* argv[]) 
+int WinMain() 
 {
-	SDL_Window* window;
+	SDL_Window* window = NULL;
 	const int SCREEN_FPS = 60;
 	const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 	Timer fpsTimer;
@@ -14,12 +14,15 @@ int main(int argc, char* argv[])
 	int countedFrames = 0;
 	fpsTimer.start();
 	Game game;
+	srand(SDL_GetTicks());
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
 	{
 		window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, false);
 
 		game.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); //Use vsync when we can if 120 fps or higher from 120 hz , 144hz the framerate cap will take care of it.
 	}
+
+	//game.MenuScreen();
 	game.Init(1280,720);
 	
 
@@ -45,6 +48,8 @@ int main(int argc, char* argv[])
 
 		if (game.gameOver)
 		{
+			fpsTimer.stop();
+			fpsTimer.start();
 			game.Init(1280,720);
 			game.gameOver = false;
 		}
