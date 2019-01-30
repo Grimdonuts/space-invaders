@@ -4,7 +4,7 @@
 #include <ctime>
 #include "Timer.h"
 
-int WinMain() 
+int main(int argc, char* argv[])
 {
 	SDL_Window* window = NULL;
 	const int SCREEN_FPS = 60;
