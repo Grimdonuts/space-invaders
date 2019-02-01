@@ -32,10 +32,10 @@ public:
 	bool Running() { return isRunning; };
 	static SDL_Renderer* renderer;
 private:
-	float resolutionW;
-	float resolutionH;
-	int screenEdgeBeginning;
-	int screenEdgeEnding;
+	float resolutionW = 0;
+	float resolutionH = 0;
+	float screenEdgeBeginning = 0;
+	float screenEdgeEnding = 0;
 	bool isRunning;
 	int count = 0;
 	int movement = 9;

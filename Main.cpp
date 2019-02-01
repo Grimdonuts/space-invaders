@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ctime>
 #include "Timer.h"
+#undef main
 
 int main(int argc, char* argv[])
 {

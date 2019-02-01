@@ -14,7 +14,7 @@ void Wall::LoadWall(int x, int y, float wallYLength)
 	dest.w = src.w * 2;
 	dest.h = src.h * 2;
 
-	if (dest.x < 500)// left wall
+	if (x < 500)// left wall
 	{
 		dest.x = x - (dest.w / 2);
 	}
