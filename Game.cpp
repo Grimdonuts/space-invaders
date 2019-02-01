@@ -11,7 +11,7 @@
 
 SDL_Renderer* Game::renderer = nullptr;
 
-Invaders invaders[55];
+Invaders invaders[5][11];
 Player player;
 Player playerLivesDisplay[3];
 Wall walls[2];
@@ -23,8 +23,10 @@ int fired = 0;
 int invadersCount = 55;
 int invmodx = 0;
 int invmody = 0;
-int randomInv1 = rand() % 55;
-int randomInv2 = rand() % 55;
+int randomInv1 = rand() % 5;
+int randomInv2 = rand() % 5;
+int randomInv12 = rand() % 11;
+int randomInv22 = rand() % 11;
 
 
 int wallLoop;
@@ -123,17 +125,20 @@ void Game::Init(int width, int height)
 		}
 	}
 
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		Invaders invader;
-		if (i % 5 < 1) invader.LoadInvaders(2);
-		else if(i % 5 < 3) invader.LoadInvaders(1);
-		else invader.LoadInvaders(3);
-		
-		// 29% to more or less get them centered with the board
-		invader.SetInvadersXY((resolutionW * 0.29f) + ((i % 11) * 50), (resolutionH * 0.05) + ((i % 5) * 50)); // 50 here because 64 is too spacey and 32 is too close
-		
-		invaders[i] = invader;
+		for (int j = 0; j < 11; j++)
+		{
+			Invaders invader;
+			if (i % 5 < 1) invader.LoadInvaders(2);
+			else if (i % 5 < 3) invader.LoadInvaders(1);
+			else invader.LoadInvaders(3);
+
+			// 29% to more or less get them centered with the board
+			invader.SetInvadersXY((resolutionW * 0.29f) + (j * 50), (resolutionH * 0.05) + (i * 50)); // 50 here because 64 is too spacey and 32 is too close
+
+			invaders[i][j] = invader;
+		}
 	}
 
 }
@@ -215,39 +220,44 @@ void Game::Update()
 
 
 	// keep movement and collision in their own loops so that it is consistent throughout. One bug when combining them is one row of invaders might shift off center
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		invaders[i].AnimateInvaders(invaderSpeed);
-
-		if (movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[i].dead)
+		for (int j = 0; j < 11; j++)
 		{
-			invaders[i].SetInvadersXY(invaders[i].GetInvaderDestRect().x + invaders[i].invadermodx, invaders[i].GetInvaderDestRect().y + invaders[i].invadermody);
-			invaders[i].invadermody = 0;
-		}
-		else if (!movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[i].dead) {
-			invaders[i].SetInvadersXY(invaders[i].GetInvaderDestRect().x - invaders[i].invadermodx, invaders[i].GetInvaderDestRect().y + invaders[i].invadermody);
-			invaders[i].invadermody = 0;
+			invaders[i][j].AnimateInvaders(invaderSpeed);
+
+			if (movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[i][j].dead)
+			{
+				invaders[i][j].SetInvadersXY(invaders[i][j].GetInvaderDestRect().x + invaders[i][j].invadermodx, invaders[i][j].GetInvaderDestRect().y + invaders[i][j].invadermody);
+				invaders[i][j].invadermody = 0;
+			}
+			else if (!movingRight && static_cast<int>((SDL_GetTicks() / invaderSpeed) % 2) && !invaders[i][j].dead) {
+				invaders[i][j].SetInvadersXY(invaders[i][j].GetInvaderDestRect().x - invaders[i][j].invadermodx, invaders[i][j].GetInvaderDestRect().y + invaders[i][j].invadermody);
+				invaders[i][j].invadermody = 0;
+			}
 		}
 	}
 
 	//aliveInvaders.clear();	
 	// keep movement and collision in their own loops so that it is consistent throughout. One bug when combining them is one row of invaders might shift off center
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-
-		if (!movingRight && !(invaders[i].GetInvaderDestRect().x > screenEdgeBeginning + 64) && invaders[i].invadermody != 10)
+		for (int j = 0; j < 11; j++)
 		{
-			movingRight = true;
-			for (int k = 0; k < 55; k++) { invaders[k].invadermody = 10; invaders[k].invadermodx = invaderMovespeed; }
-		}
+			if (!movingRight && !(invaders[i][j].GetInvaderDestRect().x > screenEdgeBeginning + 64) && invaders[i][j].invadermody != 10)
+			{
+				movingRight = true;
+				for (int k = 0; k < 5; k++) { for (int l = 0; l < 11; l++) { invaders[k][l].invadermody = 10; invaders[k][l].invadermodx = invaderMovespeed; }  }
+			}
 
-		if (movingRight && !(invaders[i].GetInvaderDestRect().x < screenEdgeEnding - 32) && invmody != 10)
-		{
-			movingRight = false;
-			for (int k = 0; k < 55; k++) { invaders[k].invadermody = 10; invaders[k].invadermodx = invaderMovespeed; }
-		}
+			if (movingRight && !(invaders[i][j].GetInvaderDestRect().x < screenEdgeEnding - 32) && invmody != 10)
+			{
+				movingRight = false;
+				for (int k = 0; k < 5; k++) { for (int l = 0; l < 11; l++) { invaders[k][l].invadermody = 10; invaders[k][l].invadermodx = invaderMovespeed; }  }
+			}
 
-		//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
+			//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
+		}
 	}
 
 
@@ -261,21 +271,24 @@ void Game::Update()
 			bullets[j].SetBulletXY(bullets[j].GetBulletDestRect().x, bullets[j].GetBulletDestRect().y - 15);
 		}
 
-		for (int i = 0; i < 55; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			if (bullets[j].GetBulletDestRect().x <= invaders[i].GetInvaderDestRect().x + (invaders[i].GetInvaderDestRect().w / 2) &&
-				bullets[j].GetBulletDestRect().x >= invaders[i].GetInvaderDestRect().x - (invaders[i].GetInvaderDestRect().w / 2) &&
-				bullets[j].GetBulletDestRect().y <= invaders[i].GetInvaderDestRect().y + (invaders[i].GetInvaderDestRect().h / 2) &&
-				bullets[j].GetBulletDestRect().y >= invaders[i].GetInvaderDestRect().y - (invaders[i].GetInvaderDestRect().h / 2) &&
-				!invaders[i].dead)
+			for (int k = 0; k < 11; k++)
 			{
-				bullets[j].hit = true;
-				invaders[i].dead = true;
-				invaders[i].timerEnd = SDL_GetTicks() + 300;
-				invadersCount--;
+				if (bullets[j].GetBulletDestRect().x <= invaders[i][k].GetInvaderDestRect().x + (invaders[i][k].GetInvaderDestRect().w / 2) &&
+					bullets[j].GetBulletDestRect().x >= invaders[i][k].GetInvaderDestRect().x - (invaders[i][k].GetInvaderDestRect().w / 2) &&
+					bullets[j].GetBulletDestRect().y <= invaders[i][k].GetInvaderDestRect().y + (invaders[i][k].GetInvaderDestRect().h / 2) &&
+					bullets[j].GetBulletDestRect().y >= invaders[i][k].GetInvaderDestRect().y - (invaders[i][k].GetInvaderDestRect().h / 2) &&
+					!invaders[i][k].dead)
+				{
+					bullets[j].hit = true;
+					invaders[i][k].dead = true;
+					invaders[i][k].timerEnd = SDL_GetTicks() + 300;
+					invadersCount--;
+				}
+
+				//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
 			}
-			
-			//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
 		}
 
 		for (int k = 0; k < 3; k++)
@@ -319,55 +332,64 @@ void Game::Update()
 		break;
 	}
 
-	randomInv1 = rand() % 55;
-	randomInv2 = rand() % 55;
+	randomInv1 = rand() % 5;
+	randomInv2 = rand() % 5;
+	randomInv12 = rand() % 11;
+	randomInv22 = rand() % 11;
 
 	if (invadersCount != 0)
 	{
-		while (invaders[randomInv1].dead)
+		while (invaders[randomInv1][randomInv12].dead)
 		{
-			randomInv1 = rand() % 55;
+			randomInv1 = rand() % 5;
+			randomInv12 = rand() % 11;
 		}
 	}
 	if (invadersCount > 1)
 	{
-		while (invaders[randomInv2].dead)
+		while (invaders[randomInv2][randomInv22].dead)
 		{
-		randomInv2 = rand() % 55;
+			randomInv2 = rand() % 5;
+			randomInv22 = rand() % 11;
 		}
 	}
 	
 
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		if (invaders[randomInv1].GetInvaderDestRect().x == invaders[i].GetInvaderDestRect().x &&
-		invaders[randomInv1].GetInvaderDestRect().y < invaders[i].GetInvaderDestRect().y)
+		for (int j = 0; j < 11; j++)
 		{
-			randomInv1 = i;
-		}
-		if (invaders[randomInv2].GetInvaderDestRect().x == invaders[i].GetInvaderDestRect().x &&
-			invaders[randomInv2].GetInvaderDestRect().y < invaders[i].GetInvaderDestRect().y)
-		{
-			randomInv2 = i;
+			if (invaders[randomInv1][randomInv12].GetInvaderDestRect().x == invaders[i][j].GetInvaderDestRect().x &&
+				invaders[randomInv1][randomInv12].GetInvaderDestRect().y < invaders[i][j].GetInvaderDestRect().y)
+			{
+				randomInv1 = i;
+				randomInv12 = j;
+			}
+			if (invaders[randomInv2][randomInv22].GetInvaderDestRect().x == invaders[i][j].GetInvaderDestRect().x &&
+				invaders[randomInv2][randomInv22].GetInvaderDestRect().y < invaders[i][j].GetInvaderDestRect().y)
+			{
+				randomInv2 = i;
+				randomInv22 = j;
+			}
 		}
 	}
 
 	for (int i = 0; i < 2; i++)
 	{
-		if (invaders[randomInv1].dead) randomInv1 = -1;
-		if (invaders[randomInv2].dead || invadersCount < 2) randomInv2 = -1;
+		if (invaders[randomInv1][randomInv12].dead) randomInv1 = -1;
+		if (invaders[randomInv2][randomInv22].dead || invadersCount < 2) randomInv2 = -1;
 
 		if (invaderBullets[i].GetBulletDestRect().x == 9999 && invaderBullets[i].GetBulletDestRect().y == 9999 && i == 0 && randomInv1 != -1)
 		{
 			invaderBullets[i].LoadBullets();
-			invaderBullets[i].SetBulletXY(invaders[randomInv1].GetInvaderDestRect().x, invaders[randomInv1].GetInvaderDestRect().y + 5);
+			invaderBullets[i].SetBulletXY(invaders[randomInv1][randomInv12].GetInvaderDestRect().x, invaders[randomInv1][randomInv12].GetInvaderDestRect().y + 5);
 			invaderBullets[i].hit = false;
 		}
 
 		if (invaderBullets[i].GetBulletDestRect().x == 9999 && invaderBullets[i].GetBulletDestRect().y == 9999 && i != 0 && randomInv2 != -1)
 		{
 			invaderBullets[i].LoadBullets();
-			invaderBullets[i].SetBulletXY(invaders[randomInv2].GetInvaderDestRect().x, invaders[randomInv2].GetInvaderDestRect().y + 5);
+			invaderBullets[i].SetBulletXY(invaders[randomInv2][randomInv22].GetInvaderDestRect().x, invaders[randomInv2][randomInv22].GetInvaderDestRect().y + 5);
 			invaderBullets[i].hit = false;
 		}
 		
@@ -397,11 +419,23 @@ void Game::Update()
 				if (player.playerLives < 0) player.playerLives = 0;
 			}
 
-			if (SDL_GetTicks() > player.timerEnd) 
+		if (SDL_GetTicks() > player.timerEnd) 
+		{
+			player.timerEnd = 0;
+			player.hit = false;
+		}
+
+		for (int j = 0; j < 2; j++)
+		{
+			if (invaderBullets[i].GetBulletDestRect().x <= bullets[j].GetBulletDestRect().x + (bullets[j].GetBulletDestRect().w / 2) &&
+				invaderBullets[i].GetBulletDestRect().x >= bullets[j].GetBulletDestRect().x - (bullets[j].GetBulletDestRect().w / 2) &&
+				invaderBullets[i].GetBulletDestRect().y <= bullets[j].GetBulletDestRect().y + (bullets[j].GetBulletDestRect().h / 2) &&
+				invaderBullets[i].GetBulletDestRect().y >= bullets[j].GetBulletDestRect().y - (bullets[j].GetBulletDestRect().h / 2))
 			{
-				player.timerEnd = 0;
-				player.hit = false;
+				invaderBullets[i].hit = true;
+				bullets[j].hit = true;
 			}
+		}
 
 		for (int k = 0; k < 3; k++)
 		{
@@ -441,15 +475,18 @@ void Game::Render()
 		TextureManager::Draw(walls[1].GetWallTexture(), walls[1].GetWallSrcRect(), walls[1].GetWallDestRect());
 	}
 
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		if (!invaders[i].dead)
+		for (int j = 0; j < 11; j++)
 		{
-			TextureManager::Draw(invaders[i].GetInvaderTexture(), invaders[i].GetInvaderSrcRect(), invaders[i].GetInvaderDestRect());
-		}
-		else if (SDL_GetTicks() < invaders[i].timerEnd) 
-		{
-			TextureManager::Draw(invaders[i].GetInvaderTexture(), invaders[i].GetInvaderSrcRect(), invaders[i].GetInvaderDestRect());
+			if (!invaders[i][j].dead)
+			{
+				TextureManager::Draw(invaders[i][j].GetInvaderTexture(), invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
+			}
+			else if (SDL_GetTicks() < invaders[i][j].timerEnd)
+			{
+				TextureManager::Draw(invaders[i][j].GetInvaderTexture(), invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
+			}
 		}
 	}
 
@@ -462,7 +499,15 @@ void Game::Render()
 	{	
 		if (!invaderBullets[i].hit) 
 		{
-			TextureManager::Draw(invaderBullets[i].GetBulletTexture(), invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
+			if (i == 0 && invadersCount != 0)
+			{
+				TextureManager::Draw(invaderBullets[i].GetBulletTexture(), invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
+			}
+
+			if (i == 1 && invadersCount > 1)
+			{
+				TextureManager::Draw(invaderBullets[i].GetBulletTexture(), invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
+			}
 		}
 	}
 
@@ -517,9 +562,12 @@ void Game::Render()
 			SDL_DestroyTexture(invaderBullets[i].GetBulletTexture());	
 		}
 
-		for (int i = 0; i < 55; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			SDL_DestroyTexture(invaders[i].GetInvaderTexture());
+			for (int j = 0; j < 11; j++)
+			{
+				SDL_DestroyTexture(invaders[i][j].GetInvaderTexture());
+			}
 		}
 
 		for (int i =0; i < 3; i++)
@@ -559,9 +607,12 @@ void Game::Clean() {
 		SDL_DestroyTexture(invaderBullets[i].GetBulletTexture());	
 	}
 
-	for (int i = 0; i < 55; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		SDL_DestroyTexture(invaders[i].GetInvaderTexture());
+		for (int j = 0; j < 11; j++)
+		{
+			SDL_DestroyTexture(invaders[i][j].GetInvaderTexture());
+		}
 	}
 	for (int i =0; i < 3; i++)
 	{
