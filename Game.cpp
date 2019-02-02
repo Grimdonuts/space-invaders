@@ -357,20 +357,13 @@ void Game::Update()
 
 	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < 11; j++)
+		if (!invaders[i][randomInv12].dead)
 		{
-			if (invaders[randomInv1][randomInv12].GetInvaderDestRect().x == invaders[i][j].GetInvaderDestRect().x &&
-				invaders[randomInv1][randomInv12].GetInvaderDestRect().y < invaders[i][j].GetInvaderDestRect().y)
-			{
-				randomInv1 = i;
-				randomInv12 = j;
-			}
-			if (invaders[randomInv2][randomInv22].GetInvaderDestRect().x == invaders[i][j].GetInvaderDestRect().x &&
-				invaders[randomInv2][randomInv22].GetInvaderDestRect().y < invaders[i][j].GetInvaderDestRect().y)
-			{
-				randomInv2 = i;
-				randomInv22 = j;
-			}
+			randomInv1 = i;
+		}
+		if (!invaders[i][randomInv22].dead)
+		{
+			randomInv2 = i;
 		}
 	}
 
