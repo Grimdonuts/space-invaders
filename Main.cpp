@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	fpsTimer.start();
 	Game game;
 	srand(SDL_GetTicks());
-	if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
+	if (SDL_Init(SDL_INIT_VIDEO) == 0)
 	{
 		window = SDL_CreateWindow("Space Invaders", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, false);
 

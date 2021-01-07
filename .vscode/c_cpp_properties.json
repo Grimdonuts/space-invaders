@@ -4,15 +4,15 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}",
-                "C:\\MinGW\\MinGW\\include\\SDL2",
-                "C:\\MinGW\\MinGW\\include"
+                "C:\\MinGW\\include\\SDL2",
+                "C:\\MinGW\\include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE"
             ],
-            "compilerPath": "C:\\mingw-w64\\bin\\gcc.exe",
-            "intelliSenseMode": "clang-x64",
+            "compilerPath": "C:\\MinGW\\bin\\gcc.exe",
+            "intelliSenseMode": "gcc-x86",
             "browse": {
                 "path": [
                     "${workspaceFolder}"
