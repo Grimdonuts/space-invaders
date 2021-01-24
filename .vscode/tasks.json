@@ -10,14 +10,14 @@
 				"main.cpp", "Game.cpp", "TextureManager.cpp", "Player.cpp", "Wall.cpp", "Invaders.cpp", "Timer.cpp", "Bullets.cpp", "Barrier.cpp",
 				"-o",
 				"${workspaceFolder}\\build\\Game",
-				"-I",
-				"C:\\MinGW\\include\\SDL2",
-				"-lmingw32",
-				"-lSDL2main",
+				"-L",
+				"${workspaceFolder}\\build\\",
 				"-lSDL2",
 				"-lSDL2_Image",
 				"--verbose",
-				"-mwindows"
+				"-mwindows",
+				"-static-libgcc",
+				"-static-libstdc++"
 			],
 			"group": {
 				"kind": "build",
