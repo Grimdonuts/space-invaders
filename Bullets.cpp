@@ -2,7 +2,6 @@
 #include "TextureManager.h"
 
 Bullets::Bullets(){
-	bullet = TextureManager::LoadTexture("assets/bullet.png");
 }
 Bullets::~Bullets(){
 }

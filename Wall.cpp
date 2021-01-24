@@ -2,7 +2,6 @@
 #include "TextureManager.h"
 
 Wall::Wall(){
-	wall = TextureManager::LoadTexture("assets/wall.png");
 }
 Wall::~Wall(){
 }

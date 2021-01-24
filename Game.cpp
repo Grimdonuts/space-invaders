@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "Barrier.h"
 
-
 SDL_Renderer* Game::renderer = nullptr;
 
 Invaders invaders[5][11];
@@ -39,16 +38,26 @@ Game::~Game()
 
 void Game::Init(int width, int height)
 {
-	Bullets bullet;
-	bullet.LoadBullets();
-	bullets = bullet;
+	
+	SDL_Texture* playerTexture = TextureManager::LoadTexture("assets/tank.png");
+	SDL_Texture* deadPlayerTexture = TextureManager::LoadTexture("assets/deadtank.png");
+	SDL_Texture* barrierTexture = TextureManager::LoadTexture("assets/barrier.png");
+	SDL_Texture* wallTexture = TextureManager::LoadTexture("assets/wall.png");
+	SDL_Texture* bulletTexture = TextureManager::LoadTexture("assets/bullet.png");
+	SDL_Texture* invaderTexture1 = TextureManager::LoadTexture("assets/invaders.png");
+	SDL_Texture* invaderTexture2 = TextureManager::LoadTexture("assets/invaders2.png");
+	SDL_Texture* invaderTexture3 = TextureManager::LoadTexture("assets/invaders3.png");
+	SDL_Texture* deadInvaderTexture = TextureManager::LoadTexture("assets/deadinvader.png");
+	player.player = playerTexture;
+	player.deadTexture = deadPlayerTexture;
+	bullets.bullet = bulletTexture;
+	bullets.LoadBullets();
 
 	player.hit = false;
 	player.playerLives = 3;
 	for (int i = 0; i < 2; i++) { 
-		Bullets invBullet;
-		invBullet.LoadBullets();
-		invaderBullets[i] = invBullet;
+		invaderBullets[i].bullet = bulletTexture;
+		invaderBullets[i].LoadBullets();
 	}
 
 	fired = 0;
@@ -85,10 +94,13 @@ void Game::Init(int width, int height)
 	player.playerx = (resolutionW / 2) - (player.GetPlayerDestRect().w / 2);
 	player.playery = resolutionH * 0.85f;
 
+	playerLivesDisplay[0].player = playerTexture;
 	playerLivesDisplay[0].LoadPlayer();
 	playerLivesDisplay[0].SetPlayerLivesCoord( 330, resolutionH * 0.96f, 16, 16);
+	playerLivesDisplay[1].player = playerTexture;
 	playerLivesDisplay[1].LoadPlayer();
 	playerLivesDisplay[1].SetPlayerLivesCoord( 310, resolutionH * 0.96f, 16, 16);
+	playerLivesDisplay[2].player = playerTexture;
 	playerLivesDisplay[2].LoadPlayer();
 	playerLivesDisplay[2].SetPlayerLivesCoord( 290, resolutionH * 0.96f, 16, 16);
 
@@ -96,9 +108,11 @@ void Game::Init(int width, int height)
 	screenEdgeEnding = ((resolutionW * 0.75f));
 	screenEdgeEnding += (screenEdgeEnding * 0.10f);
 	Wall firstWall;
+	firstWall.wall = wallTexture;
 	firstWall.LoadWall(screenEdgeBeginning, 0, (resolutionH / 64));
 	walls[0] = firstWall;
 	Wall secondWall;
+	secondWall.wall = wallTexture;
 	secondWall.LoadWall(screenEdgeEnding, 0, (resolutionH / 64));
 	walls[1] = secondWall;
 
@@ -119,6 +133,7 @@ void Game::Init(int width, int height)
 				barrierStart = 790;
 				break;
 			}
+			barriers[i][j].barrier = barrierTexture;
 			barriers[i][j].LoadBarrier(barrierStart + (j / 3) * 32, (resolutionH * 0.60f) + (j % 3) * 32 );
 			barriers[i][j].shot = false;
 		}
@@ -129,9 +144,11 @@ void Game::Init(int width, int height)
 		for (int j = 0; j < 11; j++)
 		{
 			Invaders invader;
-			if (i % 5 < 1) invader.LoadInvaders(2);
-			else if (i % 5 < 3) invader.LoadInvaders(1);
-			else invader.LoadInvaders(3);
+			if (i % 5 < 1) invader.invader = invaderTexture2;
+			else if (i % 5 < 3) invader.invader = invaderTexture1;
+			else invader.invader = invaderTexture3;
+			invader.deadInvader = deadInvaderTexture;
+			invader.LoadInvaders();
 
 			// 29% to more or less get them centered with the board
 			invader.SetInvadersXY((resolutionW * 0.29f) + (j * 50), (resolutionH * 0.05) + (i * 50)); // 50 here because 64 is too spacey and 32 is too close
@@ -139,7 +156,6 @@ void Game::Init(int width, int height)
 			invaders[i][j] = invader;
 		}
 	}
-
 }
 
 void Game::HandleEvents() {
@@ -433,19 +449,19 @@ void Game::Render()
 	SDL_RenderClear(renderer);
 	if (!player.hit)
 	{
-		TextureManager::Draw(player.GetPlayerTexture(), player.GetPlayerSrcRect(), player.GetPlayerDestRect());
+		TextureManager::Draw(player.player, player.GetPlayerSrcRect(), player.GetPlayerDestRect());
 	}
 	else if (SDL_GetTicks() < player.timerEnd) 
 	{
-		TextureManager::Draw(player.GetPlayerDeadTexture(), player.GetPlayerSrcRect(), player.GetPlayerDestRect());
+		TextureManager::Draw(player.deadTexture, player.GetPlayerSrcRect(), player.GetPlayerDestRect());
 	}
 	
 	for (int i = 0; i < wallLoop; i++)
 	{
 		walls[0].SetWallY(walls[0].GetYCoord(i));
-		TextureManager::Draw(walls[0].GetWallTexture(), walls[0].GetWallSrcRect(), walls[0].GetWallDestRect());
+		TextureManager::Draw(walls[0].wall, walls[0].GetWallSrcRect(), walls[0].GetWallDestRect());
 		walls[1].SetWallY(walls[1].GetYCoord(i));
-		TextureManager::Draw(walls[1].GetWallTexture(), walls[1].GetWallSrcRect(), walls[1].GetWallDestRect());
+		TextureManager::Draw(walls[1].wall, walls[1].GetWallSrcRect(), walls[1].GetWallDestRect());
 	}
 
 	for (int i = 0; i < 5; i++)
@@ -454,17 +470,17 @@ void Game::Render()
 		{
 			if (!invaders[i][j].dead)
 			{
-				TextureManager::Draw(invaders[i][j].GetInvaderTexture(), invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
+				TextureManager::Draw(invaders[i][j].invader, invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
 			}
 			else if (SDL_GetTicks() < invaders[i][j].timerEnd)
 			{
-				TextureManager::Draw(invaders[i][j].GetInvaderTexture(), invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
+				TextureManager::Draw(invaders[i][j].deadInvader, invaders[i][j].GetInvaderSrcRect(), invaders[i][j].GetInvaderDestRect());
 			}
 		}
 	}
 
 
-	if (!bullets.hit) TextureManager::Draw(bullets.GetBulletTexture(), bullets.GetBulletSrcRect(), bullets.GetBulletDestRect());
+	if (!bullets.hit) TextureManager::Draw(bullets.bullet, bullets.GetBulletSrcRect(), bullets.GetBulletDestRect());
 
 
 	for (int i = 0; i < 2; i++)
@@ -473,12 +489,12 @@ void Game::Render()
 		{
 			if (i == 0 && invadersCount != 0)
 			{
-				TextureManager::Draw(invaderBullets[i].GetBulletTexture(), invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
+				TextureManager::Draw(invaderBullets[i].bullet, invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
 			}
 
 			if (i == 1 && invadersCount > 1)
 			{
-				TextureManager::Draw(invaderBullets[i].GetBulletTexture(), invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
+				TextureManager::Draw(invaderBullets[i].bullet, invaderBullets[i].GetBulletSrcRect(), invaderBullets[i].GetBulletDestRect());
 			}
 		}
 	}
@@ -489,7 +505,7 @@ void Game::Render()
 		{
 			if (!barriers[i][j].shot) 
 			{
-				TextureManager::Draw(barriers[i][j].GetBarrierTexture(), barriers[i][j].GetBarrierSrcRect(), barriers[i][j].GetBarrierDestRect());
+				TextureManager::Draw(barriers[i][j].barrier, barriers[i][j].GetBarrierSrcRect(), barriers[i][j].GetBarrierDestRect());
 			}
 		}
 	}
@@ -499,40 +515,41 @@ void Game::Render()
 	switch (player.playerLives)
 	{
 		case 3:
-		TextureManager::Draw(playerLivesDisplay[0].GetPlayerTexture(), playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
-		TextureManager::Draw(playerLivesDisplay[1].GetPlayerTexture(), playerLivesDisplay[1].GetPlayerSrcRect(), playerLivesDisplay[1].GetPlayerDestRect());
-		TextureManager::Draw(playerLivesDisplay[2].GetPlayerTexture(), playerLivesDisplay[2].GetPlayerSrcRect(), playerLivesDisplay[2].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[0].player, playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[1].player, playerLivesDisplay[1].GetPlayerSrcRect(), playerLivesDisplay[1].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[2].player, playerLivesDisplay[2].GetPlayerSrcRect(), playerLivesDisplay[2].GetPlayerDestRect());
 		break;
 		case 2:
-		TextureManager::Draw(playerLivesDisplay[0].GetPlayerTexture(), playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
-		TextureManager::Draw(playerLivesDisplay[1].GetPlayerTexture(), playerLivesDisplay[1].GetPlayerSrcRect(), playerLivesDisplay[1].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[0].player, playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[1].player, playerLivesDisplay[1].GetPlayerSrcRect(), playerLivesDisplay[1].GetPlayerDestRect());
 		break;
 		case 1:
-		TextureManager::Draw(playerLivesDisplay[0].GetPlayerTexture(), playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
+		TextureManager::Draw(playerLivesDisplay[0].player, playerLivesDisplay[0].GetPlayerSrcRect(), playerLivesDisplay[0].GetPlayerDestRect());
 		break;
 		case 0: // add a gameover screen sometime
-		SDL_DestroyTexture(walls[0].GetWallTexture());
-		SDL_DestroyTexture(walls[1].GetWallTexture());
-		SDL_DestroyTexture(player.GetPlayerTexture());
-		SDL_DestroyTexture(player.GetPlayerDeadTexture());
-		SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerTexture());
-		SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerDeadTexture());
-		SDL_DestroyTexture(playerLivesDisplay[1].GetPlayerTexture());
-		SDL_DestroyTexture(playerLivesDisplay[1].GetPlayerDeadTexture());
-		SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerTexture());
-		SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerDeadTexture());
-		SDL_DestroyTexture(bullets.GetBulletTexture());	
+		SDL_DestroyTexture(walls[0].wall);
+		SDL_DestroyTexture(walls[1].wall);
+		SDL_DestroyTexture(player.player);
+		SDL_DestroyTexture(player.deadTexture);
+		SDL_DestroyTexture(playerLivesDisplay[0].player);
+		SDL_DestroyTexture(playerLivesDisplay[0].deadTexture);
+		SDL_DestroyTexture(playerLivesDisplay[1].player);
+		SDL_DestroyTexture(playerLivesDisplay[1].deadTexture);
+		SDL_DestroyTexture(playerLivesDisplay[2].player);
+		SDL_DestroyTexture(playerLivesDisplay[2].deadTexture);
+		SDL_DestroyTexture(bullets.bullet);
 
 		for (int i = 0; i < 2; i++)
 		{
-			SDL_DestroyTexture(invaderBullets[i].GetBulletTexture());	
+			SDL_DestroyTexture(invaderBullets[i].bullet);	
 		}
 
 		for (int i = 0; i < 5; i++)
 		{
 			for (int j = 0; j < 11; j++)
 			{
-				SDL_DestroyTexture(invaders[i][j].GetInvaderTexture());
+				SDL_DestroyTexture(invaders[i][j].invader);
+				SDL_DestroyTexture(invaders[i][j].deadInvader);
 			}
 		}
 
@@ -540,7 +557,7 @@ void Game::Render()
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				SDL_DestroyTexture(barriers[i][j].GetBarrierTexture());
+				SDL_DestroyTexture(barriers[i][j].barrier);
 			}
 		}
 		gameOver = true;
@@ -552,36 +569,37 @@ void Game::Render()
 
 void Game::Clean() {
 
-	SDL_DestroyTexture(bullets.GetBulletTexture());
+	SDL_DestroyTexture(bullets.bullet);
 	
-	SDL_DestroyTexture(walls[0].GetWallTexture());
-	SDL_DestroyTexture(walls[1].GetWallTexture());
-	SDL_DestroyTexture(player.GetPlayerTexture());
-	SDL_DestroyTexture(player.GetPlayerDeadTexture());
-	SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerTexture());
-	SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerDeadTexture());
-	SDL_DestroyTexture(playerLivesDisplay[1].GetPlayerTexture());
-	SDL_DestroyTexture(playerLivesDisplay[1].GetPlayerDeadTexture());
-	SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerTexture());
-	SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerDeadTexture());
+	SDL_DestroyTexture(walls[0].wall);
+	SDL_DestroyTexture(walls[1].wall);
+	SDL_DestroyTexture(player.player);
+	SDL_DestroyTexture(player.deadTexture);
+	SDL_DestroyTexture(playerLivesDisplay[0].player);
+	SDL_DestroyTexture(playerLivesDisplay[0].deadTexture);
+	SDL_DestroyTexture(playerLivesDisplay[1].player);
+	SDL_DestroyTexture(playerLivesDisplay[1].deadTexture);
+	SDL_DestroyTexture(playerLivesDisplay[2].player);
+	SDL_DestroyTexture(playerLivesDisplay[2].deadTexture);
 	
 	for (int i = 0; i < 2; i++)
 	{
-		SDL_DestroyTexture(invaderBullets[i].GetBulletTexture());	
+		SDL_DestroyTexture(invaderBullets[i].bullet);	
 	}
 
 	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 11; j++)
 		{
-			SDL_DestroyTexture(invaders[i][j].GetInvaderTexture());
+			SDL_DestroyTexture(invaders[i][j].invader);
+			SDL_DestroyTexture(invaders[i][j].deadInvader);
 		}
 	}
 	for (int i =0; i < 3; i++)
 	{
 		for (int j = 0; j < 9; j++)
 		{
-			SDL_DestroyTexture(barriers[i][j].GetBarrierTexture());
+			SDL_DestroyTexture(barriers[i][j].barrier);
 		}
 	}
 	SDL_DestroyRenderer(renderer);

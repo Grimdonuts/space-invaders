@@ -16,13 +16,11 @@ class Player {
 		void UpdatePlayerCoord();
 		void SetPlayerLivesCoord(int x, int y, int destw, int desth);
 
-		SDL_Texture* GetPlayerDeadTexture() { return deadTexture; }
-		SDL_Texture* GetPlayerTexture(){ return player; };
 		SDL_Rect GetPlayerSrcRect() { return src; }
 		SDL_Rect GetPlayerDestRect() { return dest; }
-	private:
 		SDL_Texture* player;
 		SDL_Texture* deadTexture;
+	private:
 		SDL_Rect src;
 		SDL_Rect dest;
 		

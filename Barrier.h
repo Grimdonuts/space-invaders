@@ -7,12 +7,11 @@ public:
 	~Barrier();
 	void LoadBarrier(int x, int y);
 
-	SDL_Texture* GetBarrierTexture() { return barrier; }
 	SDL_Rect GetBarrierSrcRect() { return src; }
 	SDL_Rect GetBarrierDestRect() { return dest; }
 	bool shot = false;
-private:
 	SDL_Texture* barrier;
+private:
 	SDL_Rect src;
 	SDL_Rect dest;
 };
