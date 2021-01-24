@@ -10,7 +10,8 @@ class Player {
 		int playerLives = 3;
 		int timerEnd = 0;
 		bool hit = false;
-
+		Player();
+		~Player();
 		void LoadPlayer();
 		void UpdatePlayerCoord();
 		void SetPlayerLivesCoord(int x, int y, int destw, int desth);

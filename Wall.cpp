@@ -1,8 +1,11 @@
 #include "Wall.h"
 #include "TextureManager.h"
 
-Wall::Wall(){}
-Wall::~Wall(){}
+Wall::Wall(){
+	wall = TextureManager::LoadTexture("assets/wall.png");
+}
+Wall::~Wall(){
+}
 
 void Wall::LoadWall(int x, int y, float wallYLength)
 {
@@ -28,7 +31,6 @@ void Wall::LoadWall(int x, int y, float wallYLength)
 	{
 		wallYCoords[i] = (i * 64);
 	}
-	wall = TextureManager::LoadTexture("assets/wall.png");
 }
 
 void Wall::SetWallY(int y)

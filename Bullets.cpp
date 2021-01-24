@@ -2,8 +2,10 @@
 #include "TextureManager.h"
 
 Bullets::Bullets(){
+	bullet = TextureManager::LoadTexture("assets/bullet.png");
 }
-Bullets::~Bullets(){}
+Bullets::~Bullets(){
+}
 
 void Bullets::LoadBullets() 
 {
@@ -16,8 +18,6 @@ void Bullets::LoadBullets()
 	dest.h = 32;
 	dest.y = 9999;
 	dest.x = 9999;
-
-	bullet = TextureManager::LoadTexture("assets/bullet.png");
 }
 
 void Bullets::SetBulletXY(int x, int y)
@@ -40,6 +40,4 @@ void Bullets::Clear()
 	hit = false;
 	timerEnd = 0;
 	randomInv = 0;
-
-	bullet = TextureManager::LoadTexture("assets/bullet.png");
 }

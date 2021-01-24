@@ -15,8 +15,8 @@ Invaders invaders[5][11];
 Player player;
 Player playerLivesDisplay[3];
 Wall walls[2];
-Bullets bullets[2];
-Bullets invaderBullets[3];
+Bullets bullets;
+Bullets invaderBullets[2];
 Barrier barriers[3][9];
 
 int fired = 0;
@@ -39,14 +39,13 @@ Game::~Game()
 
 void Game::Init(int width, int height)
 {
-	for (int i = 0; i < 2; i++) { 
-		Bullets bullet;
-		bullet.LoadBullets();
-		bullets[i] = bullet;
-	}
+	Bullets bullet;
+	bullet.LoadBullets();
+	bullets = bullet;
+
 	player.hit = false;
 	player.playerLives = 3;
-	for (int i = 0; i < 3; i++) { 
+	for (int i = 0; i < 2; i++) { 
 		Bullets invBullet;
 		invBullet.LoadBullets();
 		invaderBullets[i] = invBullet;
@@ -195,31 +194,19 @@ void Game::Update()
 {
 	if (!player.hit && cmd.left && player.GetPlayerDestRect().x > walls[0].GetWallDestRect().x + (walls[0].GetWallDestRect().w / 2)) { player.playerx -= 8; }
 	if (!player.hit && cmd.right && player.GetPlayerDestRect().x < walls[1].GetWallDestRect().x - (walls[1].GetWallDestRect().w / 2)) { player.playerx += 8; }
-	if (cmd.down) { std::cout << player.playerx << std::endl; }
 
 	player.UpdatePlayerCoord();
 	
-	if (!player.hit && cmd.fire && SDL_GetTicks() > bullets[0].timerEnd || cmd.fire &&
-		bullets[0].hit && SDL_GetTicks() > bullets[0].timerEnd) {
+	if (!player.hit && cmd.fire && SDL_GetTicks() > bullets.timerEnd || cmd.fire &&
+		bullets.hit && SDL_GetTicks() > bullets.timerEnd) {
 
-		bullets[0].timerEnd = SDL_GetTicks() + 1000;
+		bullets.timerEnd = SDL_GetTicks() + 1000;
 				  
-		bullets[0].LoadBullets();
-		bullets[0].SetBulletXY(player.GetPlayerDestRect().x + 16, player.playery - 5);
-	}
-	else if (!player.hit && cmd.fire && SDL_GetTicks() > bullets[1].timerEnd && SDL_GetTicks() > (bullets[0].timerEnd - 300) || cmd.fire &&
-		bullets[1].hit && SDL_GetTicks() > bullets[1].timerEnd)
-	{
-
-		bullets[1].timerEnd = SDL_GetTicks() + 1000;
-
-		bullets[1].LoadBullets();
-		bullets[1].SetBulletXY(player.GetPlayerDestRect().x + 16, player.playery - 5);
+		bullets.LoadBullets();
+		bullets.SetBulletXY(player.GetPlayerDestRect().x + 16, player.playery - 5);
 	}
 
-
-
-	// keep movement and collision in their own loops so that it is consistent throughout. One bug when combining them is one row of invaders might shift off center
+	//keep movement and collision in their own loops so that it is consistent throughout. One bug when combining them is one row of invaders might shift off center
 	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 11; j++)
@@ -238,7 +225,6 @@ void Game::Update()
 		}
 	}
 
-	//aliveInvaders.clear();	
 	// keep movement and collision in their own loops so that it is consistent throughout. One bug when combining them is one row of invaders might shift off center
 	for (int i = 0; i < 5; i++)
 	{
@@ -255,39 +241,32 @@ void Game::Update()
 				movingRight = false;
 				for (int k = 0; k < 5; k++) { for (int l = 0; l < 11; l++) { invaders[k][l].invadermody = 10; invaders[k][l].invadermodx = invaderMovespeed; }  }
 			}
-
-			//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
 		}
 	}
 
 
-	for (int j = 0; j < 2; j++)
-	{
-
-		if (bullets[j].GetBulletDestRect().y <= 0) { bullets[j].Clear(); }
-		else if (bullets[j].hit) { bullets[j].Clear(); }
-		else if (bullets[j].GetBulletDestRect().x != 9999 && bullets[j].GetBulletDestRect().y != 9999)
+		if (bullets.GetBulletDestRect().y <= 0) { bullets.Clear(); }
+		else if (bullets.hit) { bullets.Clear(); }
+		else if (bullets.GetBulletDestRect().x != 9999 && bullets.GetBulletDestRect().y != 9999)
 		{
-			bullets[j].SetBulletXY(bullets[j].GetBulletDestRect().x, bullets[j].GetBulletDestRect().y - 15);
+			bullets.SetBulletXY(bullets.GetBulletDestRect().x, bullets.GetBulletDestRect().y - 15);
 		}
 
 		for (int i = 0; i < 5; i++)
 		{
 			for (int k = 0; k < 11; k++)
 			{
-				if (bullets[j].GetBulletDestRect().x <= invaders[i][k].GetInvaderDestRect().x + (invaders[i][k].GetInvaderDestRect().w / 2) &&
-					bullets[j].GetBulletDestRect().x >= invaders[i][k].GetInvaderDestRect().x - (invaders[i][k].GetInvaderDestRect().w / 2) &&
-					bullets[j].GetBulletDestRect().y <= invaders[i][k].GetInvaderDestRect().y + (invaders[i][k].GetInvaderDestRect().h / 2) &&
-					bullets[j].GetBulletDestRect().y >= invaders[i][k].GetInvaderDestRect().y - (invaders[i][k].GetInvaderDestRect().h / 2) &&
+				if (bullets.GetBulletDestRect().x <= invaders[i][k].GetInvaderDestRect().x + (invaders[i][k].GetInvaderDestRect().w / 2) &&
+					bullets.GetBulletDestRect().x >= invaders[i][k].GetInvaderDestRect().x - (invaders[i][k].GetInvaderDestRect().w / 2) &&
+					bullets.GetBulletDestRect().y <= invaders[i][k].GetInvaderDestRect().y + (invaders[i][k].GetInvaderDestRect().h / 2) &&
+					bullets.GetBulletDestRect().y >= invaders[i][k].GetInvaderDestRect().y - (invaders[i][k].GetInvaderDestRect().h / 2) &&
 					!invaders[i][k].dead)
 				{
-					bullets[j].hit = true;
+					bullets.hit = true;
 					invaders[i][k].dead = true;
 					invaders[i][k].timerEnd = SDL_GetTicks() + 300;
 					invadersCount--;
 				}
-
-				//if (!invaders[i].dead) aliveInvaders.push_back(invaders[i]);
 			}
 		}
 
@@ -295,18 +274,18 @@ void Game::Update()
 		{
 			for (int i = 0; i < 9; i++)
 			{
-				if (bullets[j].GetBulletDestRect().x <= barriers[k][i].GetBarrierDestRect().x + (barriers[k][i].GetBarrierDestRect().w/2) &&
-				bullets[j].GetBulletDestRect().x >= barriers[k][i].GetBarrierDestRect().x - (barriers[k][i].GetBarrierDestRect().w /2) &&
-				bullets[j].GetBulletDestRect().y <= barriers[k][i].GetBarrierDestRect().y + (barriers[k][i].GetBarrierDestRect().h/2) &&
-				bullets[j].GetBulletDestRect().y >= barriers[k][i].GetBarrierDestRect().y - (barriers[k][i].GetBarrierDestRect().h/2) &&
+				if (bullets.GetBulletDestRect().x <= barriers[k][i].GetBarrierDestRect().x + (barriers[k][i].GetBarrierDestRect().w/2) &&
+				bullets.GetBulletDestRect().x >= barriers[k][i].GetBarrierDestRect().x - (barriers[k][i].GetBarrierDestRect().w /2) &&
+				bullets.GetBulletDestRect().y <= barriers[k][i].GetBarrierDestRect().y + (barriers[k][i].GetBarrierDestRect().h/2) &&
+				bullets.GetBulletDestRect().y >= barriers[k][i].GetBarrierDestRect().y - (barriers[k][i].GetBarrierDestRect().h/2) &&
 				!barriers[k][i].shot)
 				{
-					bullets[j].hit = true;
+					bullets.hit = true;
 					barriers[k][i].shot = true;
 				}
 			}
 		}
-	}
+
 
 	switch (invadersCount)
 	{
@@ -392,10 +371,7 @@ void Game::Update()
 	{
 		if (invaderBullets[i].timerEnd == 0) invaderBullets[i].timerEnd = SDL_GetTicks() + 100;
 
-		if (invaderBullets[i].GetBulletDestRect().y >= 720 && invaderBullets[i].GetBulletDestRect().y != 9999) {
-			invaderBullets[i].Clear();
-		}
-		else if (invaderBullets[i].hit) {
+		if (invaderBullets[i].hit) {
 			invaderBullets[i].Clear();
 		}
 		else { invaderBullets[i].SetBulletXY(invaderBullets[i].GetBulletDestRect().x, invaderBullets[i].GetBulletDestRect().y + 5); }
@@ -418,18 +394,18 @@ void Game::Update()
 			player.hit = false;
 		}
 
-		for (int j = 0; j < 2; j++)
-		{
-			if (invaderBullets[i].GetBulletDestRect().x <= bullets[j].GetBulletDestRect().x + (bullets[j].GetBulletDestRect().w / 2) &&
-				invaderBullets[i].GetBulletDestRect().x >= bullets[j].GetBulletDestRect().x - (bullets[j].GetBulletDestRect().w / 2) &&
-				invaderBullets[i].GetBulletDestRect().y <= bullets[j].GetBulletDestRect().y + (bullets[j].GetBulletDestRect().h / 2) &&
-				invaderBullets[i].GetBulletDestRect().y >= bullets[j].GetBulletDestRect().y - (bullets[j].GetBulletDestRect().h / 2))
-			{
-				invaderBullets[i].hit = true;
-				bullets[j].hit = true;
-			}
-		}
 
+		if (invaderBullets[i].GetBulletDestRect().x <= bullets.GetBulletDestRect().x + (bullets.GetBulletDestRect().w / 2) &&
+			invaderBullets[i].GetBulletDestRect().x >= bullets.GetBulletDestRect().x - (bullets.GetBulletDestRect().w / 2) &&
+			invaderBullets[i].GetBulletDestRect().y <= bullets.GetBulletDestRect().y + (bullets.GetBulletDestRect().h / 2) &&
+			invaderBullets[i].GetBulletDestRect().y >= bullets.GetBulletDestRect().y - (bullets.GetBulletDestRect().h / 2) && 
+			bullets.GetBulletDestRect().x != 9999 &&
+			bullets.GetBulletDestRect().y != 9999)
+		{
+				invaderBullets[i].hit = true;
+				bullets.hit = true;
+		}
+		
 		for (int k = 0; k < 3; k++)
 		{
 			for (int j = 0; j < 9; j++)
@@ -444,6 +420,10 @@ void Game::Update()
 					barriers[k][j].shot = true;
 				}
 			}
+		}
+
+		if (invaderBullets[i].GetBulletDestRect().y >= 690 && invaderBullets[i].GetBulletDestRect().y != 9999) {
+			invaderBullets[i].Clear();
 		}
 	}
 }
@@ -483,10 +463,9 @@ void Game::Render()
 		}
 	}
 
-	for (int i = 0; i < 2; i++)
-	{
-		if (!bullets[i].hit) TextureManager::Draw(bullets[i].GetBulletTexture(), bullets[i].GetBulletSrcRect(), bullets[i].GetBulletDestRect());
-	}
+
+	if (!bullets.hit) TextureManager::Draw(bullets.GetBulletTexture(), bullets.GetBulletSrcRect(), bullets.GetBulletDestRect());
+
 
 	for (int i = 0; i < 2; i++)
 	{	
@@ -534,8 +513,6 @@ void Game::Render()
 		case 0: // add a gameover screen sometime
 		SDL_DestroyTexture(walls[0].GetWallTexture());
 		SDL_DestroyTexture(walls[1].GetWallTexture());
-		walls[0] = {};
-		walls[1] = {};
 		SDL_DestroyTexture(player.GetPlayerTexture());
 		SDL_DestroyTexture(player.GetPlayerDeadTexture());
 		SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerTexture());
@@ -544,11 +521,7 @@ void Game::Render()
 		SDL_DestroyTexture(playerLivesDisplay[1].GetPlayerDeadTexture());
 		SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerTexture());
 		SDL_DestroyTexture(playerLivesDisplay[2].GetPlayerDeadTexture());
-		for (int i = 0; i < 2; i++)
-		{
-			SDL_DestroyTexture(bullets[i].GetBulletTexture());
-		}
-		
+		SDL_DestroyTexture(bullets.GetBulletTexture());	
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -563,7 +536,7 @@ void Game::Render()
 			}
 		}
 
-		for (int i =0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
@@ -578,14 +551,11 @@ void Game::Render()
 }
 
 void Game::Clean() {
-	for (int i = 0; i < 2; i++)
-	{
-		SDL_DestroyTexture(bullets[i].GetBulletTexture());
-	}
+
+	SDL_DestroyTexture(bullets.GetBulletTexture());
+	
 	SDL_DestroyTexture(walls[0].GetWallTexture());
 	SDL_DestroyTexture(walls[1].GetWallTexture());
-	walls[0] = {};
-	walls[1] = {};
 	SDL_DestroyTexture(player.GetPlayerTexture());
 	SDL_DestroyTexture(player.GetPlayerDeadTexture());
 	SDL_DestroyTexture(playerLivesDisplay[0].GetPlayerTexture());

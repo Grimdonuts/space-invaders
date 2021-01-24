@@ -1,6 +1,9 @@
 #include "Player.h"
 #include "TextureManager.h"
 
+Player::Player(){}
+Player::~Player(){}
+
 void Player::LoadPlayer()
 {
 	src.x = 0;

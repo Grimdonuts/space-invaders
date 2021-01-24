@@ -16,6 +16,5 @@ void Barrier::LoadBarrier(int x, int y)
 
 	dest.x = x;
 	dest.y = y;
-
 	barrier = TextureManager::LoadTexture("assets/barrier.png");
 }

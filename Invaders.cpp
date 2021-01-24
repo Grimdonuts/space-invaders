@@ -32,6 +32,7 @@ void Invaders::AnimateInvaders(int speed)
 	if (!dead) src.x = src.w * static_cast<int>((SDL_GetTicks() / speed) % 2);
 	else if (((SDL_GetTicks() < timerEnd)))
 	{
+		SDL_DestroyTexture(invader);
 		invader = TextureManager::LoadTexture("assets/deadinvader.png");
 		src.x = 0;
 	}
