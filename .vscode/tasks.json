@@ -16,7 +16,8 @@
 				"-lSDL2main",
 				"-lSDL2",
 				"-lSDL2_Image",
-				"--verbose"
+				"--verbose",
+				"-mwindows"
 			],
 			"group": {
 				"kind": "build",
