@@ -20,8 +20,11 @@ public:
 	~Game();
 
 	input_cmd cmd = {};
-	//void MenuScreen();
-	void Init( int width, int height);
+	void MenuScreen(int width, int height);
+	void MenuRender();
+	void MenuUpdate();
+	void MenuClean();
+	void Init(int width, int height);
 	int invaderSpeed;
 	int invaderMovespeed;
 	bool gameOver = false;
@@ -30,6 +33,7 @@ public:
 	void Render();
 	void Clean();
 	bool Running() { return isRunning; };
+	bool InMenu() { return isInMenu; };
 	static SDL_Renderer* renderer;
 private:
 	float resolutionW = 0;
@@ -37,6 +41,7 @@ private:
 	float screenEdgeBeginning = 0;
 	float screenEdgeEnding = 0;
 	bool isRunning;
+	bool isInMenu;
 	int count = 0;
 	int movement = 9;
 };

@@ -5,9 +5,9 @@
 #include "Timer.h"
 #undef main
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-	SDL_Window* window = NULL;
+	SDL_Window *window = NULL;
 	const int SCREEN_FPS = 60;
 	const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
 	Timer fpsTimer;
@@ -24,39 +24,54 @@ int main(int argc, char* argv[])
 	}
 
 	//game.MenuScreen();
-	game.Init(1280,720);
-	
+	game.MenuScreen(1280, 720);
 
-	while(game.Running())
+	while (game.Running())
 	{
 		capTimer.start();
-		float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
-		if( avgFPS > 2000000 )
+		float avgFPS = countedFrames / (fpsTimer.getTicks() / 1000.f);
+		if (avgFPS > 2000000)
 		{
 			avgFPS = 0;
 		}
-
-		game.HandleEvents();
-		game.Update();
-		game.Render();
-		++countedFrames;
-
-		int frameTicks = capTimer.getTicks();
-		if( avgFPS >= SCREEN_FPS && frameTicks < SCREEN_TICKS_PER_FRAME ) // this is more so if they are running too fast even with vsync on
+		if (game.InMenu())
 		{
-			SDL_Delay( SCREEN_TICKS_PER_FRAME - frameTicks );
+			game.HandleEvents();
+			game.MenuUpdate();
+			game.MenuRender();
+		}
+		else
+		{
+			game.HandleEvents();
+			game.Update();
+			game.Render();
+
+			if (game.gameOver)
+			{
+				game.MenuScreen(1280, 720);
+				game.gameOver = false;
+			}
 		}
 
-		if (game.gameOver)
+		++countedFrames;
+		int frameTicks = capTimer.getTicks();
+		if (avgFPS >= SCREEN_FPS && frameTicks < SCREEN_TICKS_PER_FRAME) // this is more so if they are running too fast even with vsync on
 		{
-			fpsTimer.stop();
-			fpsTimer.start();
-			game.Init(1280,720);
-			game.gameOver = false;
+			SDL_Delay(SCREEN_TICKS_PER_FRAME - frameTicks);
 		}
 	}
-	
-	game.Clean();
+
+	capTimer.stop();
+	fpsTimer.stop();
+	if (game.InMenu())
+	{
+		game.MenuClean();
+	}
+	else
+	{
+		game.Clean();
+	}
+
 	SDL_DestroyWindow(window);
 
 	return 0;
