@@ -199,6 +199,7 @@ void Game::MenuClean()
 	SDL_DestroyTexture(startTexture);
 	SDL_DestroyTexture(quitTexture);
 	SDL_DestroyTexture(leftArrowTexture);
+	SDL_DestroyTexture(controlsTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_Quit();
 }
