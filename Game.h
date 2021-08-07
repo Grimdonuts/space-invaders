@@ -22,6 +22,7 @@ public:
 	input_cmd cmd = {};
 	void MenuScreen(int width, int height);
 	void MenuRender();
+	void HandleMenuEvents(bool delayInput);
 	void MenuUpdate();
 	void MenuClean();
 	void Init(int width, int height);

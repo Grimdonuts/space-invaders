@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 		game.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); //Use vsync when we can if 120 fps or higher from 120 hz , 144hz the framerate cap will take care of it.
 	}
 
-	//game.MenuScreen();
 	game.MenuScreen(1280, 720);
 
 	while (game.Running())
@@ -36,9 +35,14 @@ int main(int argc, char *argv[])
 		}
 		if (game.InMenu())
 		{
-			game.HandleEvents();
+			game.HandleMenuEvents(game.gameOver);
 			game.MenuUpdate();
 			game.MenuRender();
+			if (game.gameOver)
+			{
+				SDL_Delay(500);
+				game.gameOver = false;
+			}
 		}
 		else
 		{
@@ -49,7 +53,6 @@ int main(int argc, char *argv[])
 			if (game.gameOver)
 			{
 				game.MenuScreen(1280, 720);
-				game.gameOver = false;
 			}
 		}
 

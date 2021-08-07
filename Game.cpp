@@ -22,6 +22,7 @@ SDL_Texture *startTexture;
 SDL_Texture *quitTexture;
 SDL_Texture *leftArrowTexture;
 SDL_Texture *rightArrowTexture;
+SDL_Texture *controlsTexture;
 SDL_Rect startSrcRect;
 SDL_Rect startDestRect;
 SDL_Rect quitSrcRect;
@@ -30,6 +31,8 @@ SDL_Rect leftArrowSrcRect;
 SDL_Rect leftArrowDestRect;
 SDL_Rect rightArrowSrcRect;
 SDL_Rect rightArrowDestRect;
+SDL_Rect controlsSrcRect;
+SDL_Rect controlsDestRect;
 
 int fired = 0;
 int invadersCount = 55;
@@ -42,6 +45,7 @@ int randomInv22 = rand() % 11;
 
 int wallLoop;
 bool movingRight = true;
+const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
 
 Game::Game()
 {
@@ -99,9 +103,64 @@ void Game::MenuScreen(int width, int height)
 	leftArrowDestRect.h = 42;
 	leftArrowDestRect.x = 516.5;
 	leftArrowDestRect.y = 280;
-	cmd.fire = 0;
+
+	controlsTexture = TextureManager::LoadTexture("assets/controls.png");
+	controlsSrcRect.x = 0;
+	controlsSrcRect.y = 0;
+	controlsSrcRect.h = 120;
+	controlsSrcRect.w = 414;
+
+	controlsDestRect.w = 414;
+	controlsDestRect.h = 120;
+	controlsDestRect.x = 5;
+	controlsDestRect.y = 600;
+
+	cmd.bomb = 0;
 	cmd.up = 0;
-	cmd.down = 0; 
+	cmd.down = 0;
+}
+
+void Game::HandleMenuEvents(bool delayInput = false)
+{
+	if (!delayInput)
+	{
+		SDL_Event event;
+		if (SDL_PollEvent(&event) == 1)
+		{
+			if (event.type == SDL_KEYDOWN && isInMenu || event.type == SDL_KEYUP && isInMenu)
+			{
+				if (keyboard_state_array[SDL_SCANCODE_RETURN])
+				{
+					cmd.bomb = 1;
+				}
+				else
+				{
+					cmd.bomb = 0;
+				}
+				if (keyboard_state_array[SDL_SCANCODE_UP])
+				{
+					cmd.up = 1;
+				}
+				else
+				{
+					cmd.up = 0;
+				}
+				if (keyboard_state_array[SDL_SCANCODE_DOWN])
+				{
+					cmd.down = 1;
+				}
+				else
+				{
+					cmd.down = 0;
+				}
+			}
+
+			switch (event.type == SDL_QUIT)
+			{
+				isRunning = false;
+			}
+		}
+	}
 }
 
 void Game::MenuUpdate()
@@ -114,13 +173,13 @@ void Game::MenuUpdate()
 	{
 		leftArrowDestRect.y = 320;
 	}
-	if (cmd.fire && leftArrowDestRect.y == 320)
+	if (cmd.bomb && leftArrowDestRect.y == 320)
 	{
 		isRunning = false;
 	}
-	else if (cmd.fire && leftArrowDestRect.y == 280)
+	else if (cmd.bomb && leftArrowDestRect.y == 280)
 	{
-		Init(1280,720);
+		Init(1280, 720);
 		isInMenu = false;
 	}
 }
@@ -131,6 +190,7 @@ void Game::MenuRender()
 	TextureManager::Draw(startTexture, startSrcRect, startDestRect);
 	TextureManager::Draw(quitTexture, quitSrcRect, quitDestRect);
 	TextureManager::Draw(leftArrowTexture, leftArrowSrcRect, leftArrowDestRect);
+	TextureManager::Draw(controlsTexture, controlsSrcRect, controlsDestRect);
 	SDL_RenderPresent(renderer);
 }
 
@@ -256,58 +316,56 @@ void Game::Init(int width, int height)
 void Game::HandleEvents()
 {
 	SDL_Event event;
-	SDL_PollEvent(&event);
-
-	const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
-
-	if (event.type == SDL_KEYDOWN && !player.hit || event.type == SDL_KEYUP && !player.hit || event.type == SDL_KEYDOWN && isInMenu
-	|| event.type == SDL_KEYUP && isInMenu)
+	if (SDL_PollEvent(&event) == 1)
 	{
-		if (keyboard_state_array[SDL_SCANCODE_SPACE])
+		if (event.type == SDL_KEYDOWN && !player.hit || event.type == SDL_KEYUP && !player.hit)
 		{
-			cmd.fire = 1;
+			if (keyboard_state_array[SDL_SCANCODE_SPACE])
+			{
+				cmd.fire = 1;
+			}
+			else
+			{
+				cmd.fire = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_UP])
+			{
+				cmd.up = 1;
+			}
+			else
+			{
+				cmd.up = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_DOWN])
+			{
+				cmd.down = 1;
+			}
+			else
+			{
+				cmd.down = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_RIGHT])
+			{
+				cmd.right = 1;
+			}
+			else
+			{
+				cmd.right = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_LEFT])
+			{
+				cmd.left = 1;
+			}
+			else
+			{
+				cmd.left = 0;
+			}
 		}
-		else
-		{
-			cmd.fire = 0;
-		}
-		if (keyboard_state_array[SDL_SCANCODE_UP])
-		{
-			cmd.up = 1;
-		}
-		else
-		{
-			cmd.up = 0;
-		}
-		if (keyboard_state_array[SDL_SCANCODE_DOWN])
-		{
-			cmd.down = 1;
-		}
-		else
-		{
-			cmd.down = 0;
-		}
-		if (keyboard_state_array[SDL_SCANCODE_RIGHT])
-		{
-			cmd.right = 1;
-		}
-		else
-		{
-			cmd.right = 0;
-		}
-		if (keyboard_state_array[SDL_SCANCODE_LEFT])
-		{
-			cmd.left = 1;
-		}
-		else
-		{
-			cmd.left = 0;
-		}
-	}
 
-	switch (event.type == SDL_QUIT)
-	{
-		isRunning = false;
+		switch (event.type == SDL_QUIT)
+		{
+			isRunning = false;
+		}
 	}
 }
 
@@ -534,6 +592,8 @@ void Game::Update()
 		{
 			invaderBullets[i].hit = true;
 			player.hit = true;
+			cmd.left = 0;
+			cmd.right = 0;
 			player.timerEnd = SDL_GetTicks() + 400;
 			player.playerLives--;
 			if (player.playerLives < 0)
