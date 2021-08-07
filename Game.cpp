@@ -125,40 +125,38 @@ void Game::HandleMenuEvents(bool delayInput = false)
 	if (!delayInput)
 	{
 		SDL_Event event;
-		if (SDL_PollEvent(&event) == 1)
+		SDL_PollEvent(&event);
+		if (event.type == SDL_KEYDOWN && isInMenu || event.type == SDL_KEYUP && isInMenu)
 		{
-			if (event.type == SDL_KEYDOWN && isInMenu || event.type == SDL_KEYUP && isInMenu)
+			if (keyboard_state_array[SDL_SCANCODE_RETURN])
 			{
-				if (keyboard_state_array[SDL_SCANCODE_RETURN])
-				{
-					cmd.bomb = 1;
-				}
-				else
-				{
-					cmd.bomb = 0;
-				}
-				if (keyboard_state_array[SDL_SCANCODE_UP])
-				{
-					cmd.up = 1;
-				}
-				else
-				{
-					cmd.up = 0;
-				}
-				if (keyboard_state_array[SDL_SCANCODE_DOWN])
-				{
-					cmd.down = 1;
-				}
-				else
-				{
-					cmd.down = 0;
-				}
+				cmd.bomb = 1;
 			}
+			else
+			{
+				cmd.bomb = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_UP])
+			{
+				cmd.up = 1;
+			}
+			else
+			{
+				cmd.up = 0;
+			}
+			if (keyboard_state_array[SDL_SCANCODE_DOWN])
+			{
+				cmd.down = 1;
+			}
+			else
+			{
+				cmd.down = 0;
+			}
+		}
 
-			switch (event.type == SDL_QUIT)
-			{
-				isRunning = false;
-			}
+		if (event.type == SDL_QUIT)
+		{
+			isRunning = false;
 		}
 	}
 }
@@ -317,56 +315,54 @@ void Game::Init(int width, int height)
 void Game::HandleEvents()
 {
 	SDL_Event event;
-	if (SDL_PollEvent(&event) == 1)
+	SDL_PollEvent(&event);
+	if (event.type == SDL_KEYDOWN && !player.hit || event.type == SDL_KEYUP && !player.hit)
 	{
-		if (event.type == SDL_KEYDOWN && !player.hit || event.type == SDL_KEYUP && !player.hit)
+		if (keyboard_state_array[SDL_SCANCODE_SPACE])
 		{
-			if (keyboard_state_array[SDL_SCANCODE_SPACE])
-			{
-				cmd.fire = 1;
-			}
-			else
-			{
-				cmd.fire = 0;
-			}
-			if (keyboard_state_array[SDL_SCANCODE_UP])
-			{
-				cmd.up = 1;
-			}
-			else
-			{
-				cmd.up = 0;
-			}
-			if (keyboard_state_array[SDL_SCANCODE_DOWN])
-			{
-				cmd.down = 1;
-			}
-			else
-			{
-				cmd.down = 0;
-			}
-			if (keyboard_state_array[SDL_SCANCODE_RIGHT])
-			{
-				cmd.right = 1;
-			}
-			else
-			{
-				cmd.right = 0;
-			}
-			if (keyboard_state_array[SDL_SCANCODE_LEFT])
-			{
-				cmd.left = 1;
-			}
-			else
-			{
-				cmd.left = 0;
-			}
+			cmd.fire = 1;
 		}
+		else
+		{
+			cmd.fire = 0;
+		}
+		if (keyboard_state_array[SDL_SCANCODE_UP])
+		{
+			cmd.up = 1;
+		}
+		else
+		{
+			cmd.up = 0;
+		}
+		if (keyboard_state_array[SDL_SCANCODE_DOWN])
+		{
+			cmd.down = 1;
+		}
+		else
+		{
+			cmd.down = 0;
+		}
+		if (keyboard_state_array[SDL_SCANCODE_RIGHT])
+		{
+			cmd.right = 1;
+		}
+		else
+		{
+			cmd.right = 0;
+		}
+		if (keyboard_state_array[SDL_SCANCODE_LEFT])
+		{
+			cmd.left = 1;
+		}
+		else
+		{
+			cmd.left = 0;
+		}
+	}
 
-		switch (event.type == SDL_QUIT)
-		{
-			isRunning = false;
-		}
+	if (event.type == SDL_QUIT)
+	{
+		isRunning = false;
 	}
 }
 
