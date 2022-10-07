@@ -1,12 +1,12 @@
-#include "Game.h"
-#include "TextureManager.h"
-#include "Player.h"
+#include "Game.hpp"
+#include "TextureManager.hpp"
+#include "Player.hpp"
 #include <iostream>
-#include "Wall.h"
-#include "Invaders.h"
-#include "Bulllets.h"
+#include "Wall.hpp"
+#include "Invaders.hpp"
+#include "Bullets.hpp"
 #include <stdlib.h>
-#include "Barrier.h"
+#include "Barrier.hpp"
 
 SDL_Renderer *Game::renderer = nullptr;
 

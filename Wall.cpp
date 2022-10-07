@@ -1,5 +1,5 @@
-#include "Wall.h"
-#include "TextureManager.h"
+#include "Wall.hpp"
+#include "TextureManager.hpp"
 
 Wall::Wall(){
 }

@@ -1,5 +1,5 @@
-#include "Bulllets.h"
-#include "TextureManager.h"
+#include "Bullets.hpp"
+#include "TextureManager.hpp"
 
 Bullets::Bullets(){
 }

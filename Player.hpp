@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "Game.h"
+#include "Game.hpp"
 
 class Player {
 	public:

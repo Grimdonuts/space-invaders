@@ -1,5 +1,5 @@
-#include "Barrier.h"
-#include "TextureManager.h"
+#include "Barrier.hpp"
+#include "TextureManager.hpp"
 
 Barrier::Barrier() {}
 Barrier::~Barrier() {}

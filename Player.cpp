@@ -1,5 +1,5 @@
-#include "Player.h"
-#include "TextureManager.h"
+#include "Player.hpp"
+#include "TextureManager.hpp"
 
 Player::Player(){}
 Player::~Player(){}

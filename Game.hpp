@@ -3,9 +3,9 @@
 #include <SDL.h>
 #include <cstdint>
 #include <vector>
-#include "Timer.h"
+#include "Timer.hpp"
 
-struct input_cmd{
+struct input_cmd {
     uint32_t up:1;
     uint32_t down:1;
     uint32_t right:1;

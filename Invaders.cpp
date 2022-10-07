@@ -1,5 +1,5 @@
-#include "Invaders.h"
-#include "TextureManager.h"
+#include "Invaders.hpp"
+#include "TextureManager.hpp"
 
 Invaders::Invaders(){}
 Invaders::~Invaders(){}

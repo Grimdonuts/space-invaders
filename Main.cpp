@@ -1,8 +1,8 @@
-#include "Game.h"
+#include "Game.hpp"
 #include <SDL_video.h>
 #include <iostream>
 #include <ctime>
-#include "Timer.h"
+#include "Timer.hpp"
 #undef main
 
 int main(int argc, char *argv[])

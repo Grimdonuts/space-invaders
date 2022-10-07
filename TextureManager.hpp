@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL_image.h>
-#include "Game.h"
+#include "Game.hpp"
 
 class TextureManager {
 	public:
